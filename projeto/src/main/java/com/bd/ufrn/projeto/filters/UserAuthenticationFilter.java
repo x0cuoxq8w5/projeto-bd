@@ -1,6 +1,7 @@
 package com.bd.ufrn.projeto.filters;
 
 import com.bd.ufrn.projeto.models.User;
+import com.bd.ufrn.projeto.repositories.UserRepository;
 import com.bd.ufrn.projeto.services.JwtTokenService;
 import com.bd.ufrn.projeto.services.UserService;
 import jakarta.servlet.FilterChain;
@@ -23,7 +24,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenService jwtTokenService;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -33,7 +34,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
             String token = authorizationHeader.substring(7);
             try {
                 String subject = jwtTokenService.getSubjectFromToken(token);
-                User user = userService.findByEmail(subject);
+                User user = userRepository.findByEmail(subject);
 
                 // Cria um objeto de autenticação do Spring Security
                 Authentication authentication = new UsernamePasswordAuthenticationToken(user, null);

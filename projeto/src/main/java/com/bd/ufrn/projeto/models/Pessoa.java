@@ -7,7 +7,6 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 @Getter
 @Setter
-@Builder
 public abstract class Pessoa {
     int cpf;
     LocalDateTime dataNascimento;
