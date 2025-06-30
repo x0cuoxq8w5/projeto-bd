@@ -113,7 +113,7 @@ class QuartoRepositoryTest {
         when(resultSet.getInt("numero")).thenReturn(101);
         when(resultSet.getBoolean("nao_perturbe")).thenReturn(false);
         when(resultSet.getBoolean("ocupado")).thenReturn(true);
-        when(resultSet.getBoolean("marcado_pra_limpeza")).thenReturn(false);
+        when(resultSet.getBoolean("marcado_para_limpeza")).thenReturn(false);
         when(resultSet.getString("tipo")).thenReturn("SIMPLES");
 
         Quarto result = quartoRepository.findById(quartoId);
@@ -156,7 +156,7 @@ class QuartoRepositoryTest {
         when(resultSet.getInt("numero")).thenReturn(202);
         when(resultSet.getBoolean("nao_perturbe")).thenReturn(true);
         when(resultSet.getBoolean("ocupado")).thenReturn(true);
-        when(resultSet.getBoolean("marcado_pra_limpeza")).thenReturn(true);
+        when(resultSet.getBoolean("marcado_para_limpeza")).thenReturn(true);
         when(resultSet.getString("tipo")).thenReturn("SIMPLES");
 
         Quarto result = quartoRepository.findById(quartoId);
