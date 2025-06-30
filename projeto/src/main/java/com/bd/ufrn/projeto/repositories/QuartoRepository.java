@@ -95,6 +95,7 @@ public class QuartoRepository extends AbstractRepository<Quarto> implements Stro
         }
     }
 
+    @Override
     public void save(Quarto quarto) {
         try {
             connect();
