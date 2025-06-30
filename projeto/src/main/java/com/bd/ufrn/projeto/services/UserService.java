@@ -54,7 +54,7 @@ public class UserService {
         return newUser;
     }
 
-    public User findUser(Long id) {
+    public User findUser(Integer id) {
         return userRepository.findById(id);
     }
 

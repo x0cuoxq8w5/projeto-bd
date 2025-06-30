@@ -1,11 +1,16 @@
 package com.bd.ufrn.projeto.repositories;
 
-import com.bd.ufrn.projeto.models.Limpeza;
 import com.bd.ufrn.projeto.models.PedidoHasProduto;
+import lombok.*;
 
 import java.util.List;
 
-public class LimpezaRepository extends AbstractRepository<Limpeza>{
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
+public class PedidoHasProdutoRepository extends AbstractRepository<PedidoHasProduto> {
     //SELECT * FROM pedido_has_produto WHERE id_pedido = <idPedido> AND id_produto = <idProduto>
     public PedidoHasProduto findByIds(Integer idPedido, Integer idProduto) {
         return null;
@@ -18,5 +23,4 @@ public class LimpezaRepository extends AbstractRepository<Limpeza>{
     public List<PedidoHasProduto> findByPedidoId(Integer idPedido) {
         return null;
     }
-
 }
