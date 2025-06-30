@@ -8,10 +8,7 @@ import com.bd.ufrn.projeto.models.User;
 import java.util.List;
 
 public class FuncionarioRepository extends AbstractRepository<Funcionario> implements StrongEntity<Funcionario,Integer> {
-    //SELECT * FROM funcionario WHERE num_funcionario = <num>
-    public Funcionario findByNum(Integer num) {
-        return null;
-    }
+
     //SELECT * FROM funcionario WHERE administrador = 1
     public List<Funcionario> findAdmins() {
         return null;
@@ -20,5 +17,26 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
     //SELECT * FROM (funcionario NATURAL JOIN papel) WHERE papel = <papel.name()>
     public List<Funcionario> findByPapel(Papel papel) {
         return null;
+    }
+
+    //SELECT * FROM funcionario WHERE num_funcionario = <num>
+    @Override
+    public Funcionario findById(Integer integer) {
+        return null;
+    }
+
+    @Override
+    public void save(Funcionario entity) {
+
+    }
+
+    @Override
+    public void delete(Funcionario entity) {
+
+    }
+
+    @Override
+    public List<Funcionario> findAll() {
+        return List.of();
     }
 }

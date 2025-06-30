@@ -27,4 +27,24 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
     public List<Reserva> findByNumQuarto(Integer numQuarto) {
         return null;
     }
+
+    @Override
+    public Reserva findById(Integer integer) {
+        return null;
+    }
+
+    @Override
+    public void save(Reserva entity) {
+
+    }
+
+    @Override
+    public void delete(Reserva entity) {
+
+    }
+
+    @Override
+    public List<Reserva> findAll() {
+        return List.of();
+    }
 }

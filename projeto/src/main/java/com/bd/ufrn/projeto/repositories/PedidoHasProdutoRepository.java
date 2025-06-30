@@ -23,4 +23,19 @@ public class PedidoHasProdutoRepository extends AbstractRepository<PedidoHasProd
     public List<PedidoHasProduto> findByPedidoId(Integer idPedido) {
         return null;
     }
+
+    @Override
+    public void save(PedidoHasProduto entity) {
+
+    }
+
+    @Override
+    public void delete(PedidoHasProduto entity) {
+
+    }
+
+    @Override
+    public List<PedidoHasProduto> findAll() {
+        return List.of();
+    }
 }
