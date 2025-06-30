@@ -62,7 +62,7 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public void updateUserById(Long id, UserDTO userDTO) {
+    public void updateUserById(Integer id, UserDTO userDTO) {
         User user = findUser(id);
         if (userDTO.name() != null) user.setName(userDTO.name());
         if (userDTO.email() != null) user.setEmail(userDTO.email());
@@ -70,7 +70,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteUserById(Long id) {
+    public void deleteUserById(Integer id) {
         userRepository.delete(findUser(id));
     }
 
