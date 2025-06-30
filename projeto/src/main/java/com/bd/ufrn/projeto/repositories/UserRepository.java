@@ -12,4 +12,24 @@ public class UserRepository extends AbstractRepository<User> implements StrongEn
     public User findByEmail(String email) {
         return null;
     }
+
+    @Override
+    public User findById(Integer integer) {
+        return null;
+    }
+
+    @Override
+    public void save(User entity) {
+
+    }
+
+    @Override
+    public void delete(User entity) {
+
+    }
+
+    @Override
+    public List<User> findAll() {
+        return List.of();
+    }
 }

@@ -9,13 +9,10 @@ public abstract class AbstractRepository<Type> {
     //INSERT INTO <TYPENAME> VALUES ()
     //checagem de null pros notnull, insere com null pros outros
     //Se já existe tem que ser um update que dá set nos valores
-    abstract public void save(Type entity) {
-    }
+    abstract public void save(Type entity);
 
     //DELETE FROM <TYPENAME> WHERE <id> = id
-    abstract public void delete(Type entity) {}
+    abstract public void delete(Type entity);
     //SELECT * FROM <TYPENAME>
-    abstract public List<Type> findAll() {
-        return null;
-    }
+    abstract public List<Type> findAll();
 }

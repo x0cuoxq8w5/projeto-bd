@@ -14,4 +14,24 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
     public List<Reserva> findByCpf(Integer cpf) {
         return null;
     }
+
+    @Override
+    public Pedido findById(Integer integer) {
+        return null;
+    }
+
+    @Override
+    public void save(Pedido entity) {
+
+    }
+
+    @Override
+    public void delete(Pedido entity) {
+
+    }
+
+    @Override
+    public List<Pedido> findAll() {
+        return List.of();
+    }
 }

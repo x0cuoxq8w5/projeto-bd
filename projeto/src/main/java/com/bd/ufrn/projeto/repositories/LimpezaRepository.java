@@ -19,4 +19,18 @@ public class LimpezaRepository extends AbstractRepository<Limpeza>{
         return null;
     }
 
+    @Override
+    public void save(Limpeza entity) {
+
+    }
+
+    @Override
+    public void delete(Limpeza entity) {
+
+    }
+
+    @Override
+    public List<Limpeza> findAll() {
+        return List.of();
+    }
 }
