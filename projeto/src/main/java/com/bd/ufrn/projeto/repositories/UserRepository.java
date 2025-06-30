@@ -7,6 +7,7 @@ import java.util.List;
 
 @Repository
 public class UserRepository extends AbstractRepository<User,Integer>{
+    //Que nem findbyid só que com string
     public User findByEmail(String email) {
         return null;
     }
