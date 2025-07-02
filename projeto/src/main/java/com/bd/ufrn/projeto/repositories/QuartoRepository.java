@@ -8,16 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class QuartoRepository extends AbstractRepository<Quarto> implements StrongEntity<Quarto, Integer> {
-    private Connection connection;
-    private Statement command;
     private final ConnectionFactory connectionFactory;
 
     @Autowired
@@ -26,49 +24,72 @@ public class QuartoRepository extends AbstractRepository<Quarto> implements Stro
     }
 
     public List<Quarto> findByOcupado() {
-        return executeSelectQuery("SELECT * FROM quarto WHERE ocupado = true");
+        List<Quarto> quartos = new ArrayList<>();
+        String sql = "SELECT * FROM quarto WHERE ocupado = ?";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setBoolean(1, true);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    quartos.add(mapResultSetToQuarto(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return quartos;
     }
 
     public List<Quarto> findByMarcado() {
-        return executeSelectQuery("SELECT * FROM quarto WHERE marcado_para_limpeza = true");
+        List<Quarto> quartos = new ArrayList<>();
+        String sql = "SELECT * FROM quarto WHERE marcado_para_limpeza = ?";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setBoolean(1, true);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    quartos.add(mapResultSetToQuarto(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return quartos;
     }
 
     public List<Quarto> findByTipo(TipoQuarto tipo) {
-        return executeSelectQuery("SELECT * FROM quarto WHERE tipo LIKE '" + tipo.name() + "'");
+        List<Quarto> quartos = new ArrayList<>();
+        String sql = "SELECT * FROM quarto WHERE tipo LIKE ?";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, tipo.name());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    quartos.add(mapResultSetToQuarto(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return quartos;
     }
 
     @Override
     public Quarto findById(Integer numero) {
         Quarto quarto = null;
-        try {
-            connect();
-            String sql = "SELECT * FROM quarto WHERE numero = " + numero;
-            ResultSet resultSet = command.executeQuery(sql);
-            if (resultSet.next()) {
-                quarto = mapResultSetToQuarto(resultSet);
+        String sql = "SELECT * FROM quarto WHERE numero = ?";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, numero);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    quarto = mapResultSetToQuarto(resultSet);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeConnection();
         }
         return quarto;
-    }
-
-    private List<Quarto> executeSelectQuery(String sql) {
-        List<Quarto> quartos = new ArrayList<>();
-        try {
-            connect();
-            ResultSet resultSet = command.executeQuery(sql);
-            while (resultSet.next()) {
-                quartos.add(mapResultSetToQuarto(resultSet));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
-        return quartos;
     }
 
     private Quarto mapResultSetToQuarto(ResultSet resultSet) throws SQLException {
@@ -81,61 +102,49 @@ public class QuartoRepository extends AbstractRepository<Quarto> implements Stro
                 .build();
     }
 
-    public void connect() throws SQLException {
-        connection = connectionFactory.connection();
-        command = connection.createStatement();
-    }
-
-    public void closeConnection() {
-        try {
-            if (command != null) command.close();
-            if (connection != null) connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void save(Quarto quarto) {
-        try {
-            connect();
-            String sql = String.format("INSERT INTO quarto (%s) VALUES (%s)", getQuartoColumns(), getQuartoValues(quarto));
-            command.executeUpdate(sql);
+        String sql = "INSERT INTO quarto (numero, nao_perturbe, ocupado, marcado_para_limpeza, tipo) VALUES (?, ?, ?, ?, ?)";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, quarto.getNumero());
+            preparedStatement.setBoolean(2, quarto.isNaoPerturbe());
+            preparedStatement.setBoolean(3, quarto.isOcupado());
+            preparedStatement.setBoolean(4, quarto.isMarcadoPraLimpeza());
+            preparedStatement.setString(5, quarto.getTipo().toString());
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeConnection();
         }
-    }
-
-    private String getQuartoValues(Quarto quarto) {
-        return String.format("%d, %b, %b, %b, '%s'",
-                quarto.getNumero(),
-                quarto.isNaoPerturbe(),
-                quarto.isOcupado(),
-                quarto.isMarcadoPraLimpeza(),
-                quarto.getTipo().toString());
-    }
-
-    private String getQuartoColumns() {
-        return "numero, nao_perturbe, ocupado, marcado_para_limpeza, tipo";
     }
 
     @Override
     public void delete(Quarto entity) {
-        try {
-            connect();
-            String sql = "DELETE FROM quarto WHERE numero = " + entity.getNumero();
-            command.executeUpdate(sql);
+        String sql = "DELETE FROM quarto WHERE numero = ?";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, entity.getNumero());
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            closeConnection();
         }
     }
 
     @Override
     public List<Quarto> findAll() {
-        return executeSelectQuery("SELECT * FROM quarto");
+        List<Quarto> quartos = new ArrayList<>();
+        String sql = "SELECT * FROM quarto";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    quartos.add(mapResultSetToQuarto(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return quartos;
     }
 }
