@@ -27,7 +27,7 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
     @Override
     public Funcionario findById(Integer cpf) {
         Funcionario funcionario = null;
-        String sql = "SELECT p.*, f.num_funcionario, f.administrador FROM pessoa p INNER JOIN funcionario f ON p.cpf = f.cpf WHERE p.cpf = ?";
+        String sql = "SELECT f.* FROM funcionario f WHERE f.cpf = ?";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, cpf);
@@ -59,14 +59,13 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
     }
 
     private Funcionario mapResultSetToFuncionario(ResultSet resultSet) throws SQLException {
-        Funcionario funcionario = Funcionario.builder()
+        return Funcionario.builder()
+                .cpf(resultSet.getInt("cpf"))
+                .nome(resultSet.getString("nome_sobrenome"))
+                .dataNascimento(resultSet.getTimestamp("data_nasc").toLocalDateTime())
                 .numFuncionario(resultSet.getInt("num_funcionario"))
                 .administrador(resultSet.getBoolean("administrador"))
                 .build();
-        funcionario.setCpf(resultSet.getInt("cpf"));
-        funcionario.setNome(resultSet.getString("nome_sobrenome"));
-        funcionario.setDataNascimento(resultSet.getTimestamp("data_nasc").toLocalDateTime());
-        return funcionario;
     }
 
     @Override
@@ -76,18 +75,12 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
             connection = connectionFactory.connection();
             connection.setAutoCommit(false);
 
-            // Save Pessoa data
-            String pessoaSql = "INSERT INTO pessoa (cpf, nome_sobrenome, data_nasc) VALUES (?, ?, ?)";
-            try (PreparedStatement pessoaStatement = connection.prepareStatement(pessoaSql)) {
-                pessoaStatement.setInt(1, funcionario.getCpf());
-                pessoaStatement.setString(2, funcionario.getNome());
-                pessoaStatement.setTimestamp(3, Timestamp.valueOf(funcionario.getDataNascimento()));
-                pessoaStatement.executeUpdate();
-            }
-
             // Save Funcionario data
-            String funcionarioSql = "INSERT INTO funcionario (cpf, num_funcionario, administrador) VALUES (?, ?, ?)";
+            String funcionarioSql = "INSERT INTO funcionario (cpf, nome_sobrenome, data_nasc, num_funcionario, administrador) VALUES (?, ?, ?)";
             try (PreparedStatement funcionarioStatement = connection.prepareStatement(funcionarioSql)) {
+                funcionarioStatement.setInt(1, funcionario.getCpf());
+                funcionarioStatement.setString(2, funcionario.getNome());
+                funcionarioStatement.setTimestamp(3, Timestamp.valueOf(funcionario.getDataNascimento()));
                 funcionarioStatement.setInt(1, funcionario.getCpf());
                 funcionarioStatement.setInt(2, funcionario.getNumFuncionario());
                 funcionarioStatement.setBoolean(3, funcionario.isAdministrador());
@@ -150,13 +143,6 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
                 funcionarioStatement.executeUpdate();
             }
 
-            // Delete Pessoa data
-            String pessoaSql = "DELETE FROM pessoa WHERE cpf = ?";
-            try (PreparedStatement pessoaStatement = connection.prepareStatement(pessoaSql)) {
-                pessoaStatement.setInt(1, entity.getCpf());
-                pessoaStatement.executeUpdate();
-            }
-
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -182,7 +168,7 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
     @Override
     public List<Funcionario> findAll() {
         List<Funcionario> funcionarios = new ArrayList<>();
-        String sql = "SELECT p.*, f.num_funcionario, f.administrador FROM pessoa p INNER JOIN funcionario f ON p.cpf = f.cpf";
+        String sql = "SELECT f.num_funcionario, f.administrador FROM funcionario f WHERE f.cpf = ?";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
