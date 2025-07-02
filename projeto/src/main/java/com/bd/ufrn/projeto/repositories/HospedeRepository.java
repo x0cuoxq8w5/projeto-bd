@@ -27,7 +27,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
     @Override
     public Hospede findById(Integer cpf) {
         Hospede hospede = null;
-        String sql = "SELECT p.* FROM pessoa p INNER JOIN hospede h ON p.cpf = h.cpf WHERE p.cpf = ?";
+        String sql = "SELECT * FROM hospede WHERE cpf = ?";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, cpf);
@@ -51,7 +51,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
         return hospede;
     }
 
-    // Save a new Hospede (and corresponding Pessoa) to the database
+    // Save a new Hospede to the database
     @Override
     public void save(Hospede hospede) {
         Connection connection = null;
@@ -59,22 +59,14 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
             connection = connectionFactory.connection();
             connection.setAutoCommit(false);
 
-            // Insert into 'pessoa' table
-            String pessoaSql = "INSERT INTO pessoa (cpf, nome_sobrenome, data_nasc) VALUES (?, ?, ?)";
+            // Insert into 'hospede' table
+            String pessoaSql = "INSERT INTO hospede (cpf, nome_sobrenome, data_nasc) VALUES (?, ?, ?)";
             try (PreparedStatement pessoaStatement = connection.prepareStatement(pessoaSql)) {
                 pessoaStatement.setInt(1, hospede.getCpf());
                 pessoaStatement.setString(2, hospede.getNome());
                 pessoaStatement.setTimestamp(3, Timestamp.valueOf(hospede.getDataNascimento()));
                 pessoaStatement.executeUpdate();
             }
-
-            // Insert into 'hospede' table
-            String hospedeSql = "INSERT INTO hospede (cpf) VALUES (?)";
-            try (PreparedStatement hospedeStatement = connection.prepareStatement(hospedeSql)) {
-                hospedeStatement.setInt(1, hospede.getCpf());
-                hospedeStatement.executeUpdate();
-            }
-
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -107,18 +99,11 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
             connection = connectionFactory.connection();
             connection.setAutoCommit(false);
 
-            // Delete from 'hospede' first (due to FK constraints)
+
             String hospedeSql = "DELETE FROM hospede WHERE cpf = ?";
             try (PreparedStatement hospedeStatement = connection.prepareStatement(hospedeSql)) {
                 hospedeStatement.setInt(1, entity.getCpf());
                 hospedeStatement.executeUpdate();
-            }
-
-            // Then delete from 'pessoa'
-            String pessoaSql = "DELETE FROM pessoa WHERE cpf = ?";
-            try (PreparedStatement pessoaStatement = connection.prepareStatement(pessoaSql)) {
-                pessoaStatement.setInt(1, entity.getCpf());
-                pessoaStatement.executeUpdate();
             }
 
             connection.commit();
@@ -149,7 +134,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
     @Override
     public List<Hospede> findAll() {
         List<Hospede> hospedes = new ArrayList<>();
-        String sql = "SELECT p.* FROM pessoa p INNER JOIN hospede h ON p.cpf = h.cpf";
+        String sql = "SELECT * FROM hospede";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
