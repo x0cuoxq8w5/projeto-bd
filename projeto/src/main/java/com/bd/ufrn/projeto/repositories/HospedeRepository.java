@@ -23,6 +23,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
         this.connectionFactory = connectionFactory;
     }
 
+    // Retrieve a Hospede by CPF
     @Override
     public Hospede findById(Integer cpf) {
         Hospede hospede = null;
@@ -41,14 +42,16 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
         return hospede;
     }
 
+    // Helper method to convert ResultSet into a Hospede object
     private Hospede mapResultSetToHospede(ResultSet resultSet) throws SQLException {
-        Hospede hospede = Hospede.builder().build(); // Assuming Hospede doesn't have specific fields beyond Pessoa for now
+        Hospede hospede = Hospede.builder().build();
         hospede.setCpf(resultSet.getInt("cpf"));
         hospede.setNome(resultSet.getString("nome_sobrenome"));
         hospede.setDataNascimento(resultSet.getTimestamp("data_nasc").toLocalDateTime());
         return hospede;
     }
 
+    // Save a new Hospede (and corresponding Pessoa) to the database
     @Override
     public void save(Hospede hospede) {
         Connection connection = null;
@@ -56,7 +59,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
             connection = connectionFactory.connection();
             connection.setAutoCommit(false);
 
-            // Save Pessoa data
+            // Insert into 'pessoa' table
             String pessoaSql = "INSERT INTO pessoa (cpf, nome_sobrenome, data_nasc) VALUES (?, ?, ?)";
             try (PreparedStatement pessoaStatement = connection.prepareStatement(pessoaSql)) {
                 pessoaStatement.setInt(1, hospede.getCpf());
@@ -65,7 +68,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
                 pessoaStatement.executeUpdate();
             }
 
-            // Save Hospede data (assuming hospede table only has cpf as a foreign key to pessoa)
+            // Insert into 'hospede' table
             String hospedeSql = "INSERT INTO hospede (cpf) VALUES (?)";
             try (PreparedStatement hospedeStatement = connection.prepareStatement(hospedeSql)) {
                 hospedeStatement.setInt(1, hospede.getCpf());
@@ -75,6 +78,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            // Roll back in case of error
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -83,6 +87,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
                 }
             }
         } finally {
+            // Clean up and reset connection state
             if (connection != null) {
                 try {
                     connection.setAutoCommit(true);
@@ -94,6 +99,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
         }
     }
 
+    // Delete a Hospede (and associated Pessoa) from the database
     @Override
     public void delete(Hospede entity) {
         Connection connection = null;
@@ -101,14 +107,14 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
             connection = connectionFactory.connection();
             connection.setAutoCommit(false);
 
-            // Delete Hospede data first
+            // Delete from 'hospede' first (due to FK constraints)
             String hospedeSql = "DELETE FROM hospede WHERE cpf = ?";
             try (PreparedStatement hospedeStatement = connection.prepareStatement(hospedeSql)) {
                 hospedeStatement.setInt(1, entity.getCpf());
                 hospedeStatement.executeUpdate();
             }
 
-            // Delete Pessoa data
+            // Then delete from 'pessoa'
             String pessoaSql = "DELETE FROM pessoa WHERE cpf = ?";
             try (PreparedStatement pessoaStatement = connection.prepareStatement(pessoaSql)) {
                 pessoaStatement.setInt(1, entity.getCpf());
@@ -118,6 +124,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            // Roll back in case of error
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -126,6 +133,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
                 }
             }
         } finally {
+            // Clean up and reset connection state
             if (connection != null) {
                 try {
                     connection.setAutoCommit(true);
@@ -137,6 +145,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
         }
     }
 
+    // Retrieve all Hospedes from the database
     @Override
     public List<Hospede> findAll() {
         List<Hospede> hospedes = new ArrayList<>();
