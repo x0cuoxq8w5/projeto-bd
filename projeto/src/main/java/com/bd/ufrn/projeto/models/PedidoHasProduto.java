@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class PedidoHasProduto {
-    Integer idPedido;
-    Integer idProduto;
-    Double precoItem;
+    private Integer idPedido;
+    private Integer idProduto;
+    private Double precoItem;
 }

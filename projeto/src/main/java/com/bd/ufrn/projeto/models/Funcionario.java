@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @SuperBuilder
 public class Funcionario extends Pessoa{
-    int numFuncionario;
-    boolean administrador;
-    List<Papel> papeis;
+    private int numFuncionario;
+    private boolean administrador;
+    private List<Papel> papeis;
 }
