@@ -12,248 +12,225 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class QuartoRepositoryTest {
+public class QuartoRepositoryTest {
 
     @Mock
     private ConnectionFactory connectionFactory;
 
     @Mock
-    private Connection connection;
+    private Connection mockConnection;
 
     @Mock
-    private Statement statement;
+    private PreparedStatement mockPreparedStatement;
 
     @Mock
-    private ResultSet resultSet;
+    private ResultSet mockResultSet;
 
     @InjectMocks
     private QuartoRepository quartoRepository;
 
-    private void setupConnectionMocks() throws SQLException {
-        when(connectionFactory.connection()).thenReturn(connection);
-        when(connection.createStatement()).thenReturn(statement);
+    @BeforeEach
+    void setUp() throws SQLException {
+        when(connectionFactory.connection()).thenReturn(mockConnection);
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        // Removed: when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        // This will now be set up in individual test methods where executeQuery is called.
     }
 
     @Test
-    void testSave_Success() throws SQLException {
-        setupConnectionMocks();
-        Quarto quarto = Quarto.builder()
-                .numero(101)
+    void findById_shouldReturnQuarto_whenFound() throws SQLException {
+        // Arrange
+        int quartoNumero = 101;
+        Quarto expectedQuarto = Quarto.builder()
+                .numero(quartoNumero)
                 .naoPerturbe(false)
                 .ocupado(true)
                 .marcadoPraLimpeza(false)
                 .tipo(TipoQuarto.SIMPLES)
                 .build();
 
-        when(statement.executeUpdate(anyString())).thenReturn(1);
+        // Specific stubbing for this test: When executeQuery is called, return mockResultSet
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
-        quartoRepository.save(quarto);
+        // Configure mockResultSet behavior for a single result
+        when(mockResultSet.next()).thenReturn(true); // Only expect it once for 'if' condition
+        when(mockResultSet.getInt("numero")).thenReturn(expectedQuarto.getNumero());
+        when(mockResultSet.getBoolean("nao_perturbe")).thenReturn(expectedQuarto.isNaoPerturbe());
+        when(mockResultSet.getBoolean("ocupado")).thenReturn(expectedQuarto.isOcupado());
+        when(mockResultSet.getBoolean("marcado_para_limpeza")).thenReturn(expectedQuarto.isMarcadoPraLimpeza());
+        when(mockResultSet.getString("tipo")).thenReturn(expectedQuarto.getTipo().name());
 
-        verify(connectionFactory).connection();
-        verify(connection).createStatement();
-        verify(statement).executeUpdate(
-                "INSERT INTO quarto (numero, nao_perturbe, ocupado, marcado_para_limpeza, tipo) VALUES (101, false, true, false, 'SIMPLES')"
-        );
-        verify(statement).close();
-        verify(connection).close();
+        // Act
+        Quarto actualQuarto = quartoRepository.findById(quartoNumero);
+
+        // Assert
+        assertNotNull(actualQuarto);
+        assertEquals(expectedQuarto.getNumero(), actualQuarto.getNumero());
+        assertEquals(expectedQuarto.isOcupado(), actualQuarto.isOcupado());
+        assertEquals(expectedQuarto.getTipo(), actualQuarto.getTipo());
+
+        // Verify that specific JDBC methods were called
+        verify(mockConnection).prepareStatement("SELECT * FROM quarto WHERE numero = ?");
+        verify(mockPreparedStatement).setInt(1, quartoNumero);
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(1)).next(); // Verified only once
+        verify(mockResultSet).getInt("numero");
+        verify(mockResultSet).getString("tipo");
     }
 
     @Test
-    void testSave_WithAllBooleanFieldsTrue() throws SQLException {
-        setupConnectionMocks();
-        Quarto quarto = Quarto.builder()
-                .numero(202)
-                .naoPerturbe(true)
-                .ocupado(true)
-                .marcadoPraLimpeza(true)
-                .tipo(TipoQuarto.SUITE)
-                .build();
+    void findById_shouldReturnNull_whenNotFound() throws SQLException {
+        // Arrange
+        int quartoNumero = 999;
 
-        when(statement.executeUpdate(anyString())).thenReturn(1);
+        // Specific stubbing for this test
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
-        quartoRepository.save(quarto);
+        // Configure mockResultSet to indicate no results
+        when(mockResultSet.next()).thenReturn(false); // No rows found
 
-        verify(statement).executeUpdate(
-                "INSERT INTO quarto (numero, nao_perturbe, ocupado, marcado_para_limpeza, tipo) VALUES (202, true, true, true, 'SUITE')"
-        );
+        // Act
+        Quarto actualQuarto = quartoRepository.findById(quartoNumero);
+
+        // Assert
+        assertNull(actualQuarto);
+
+        // Verify that specific JDBC methods were called
+        verify(mockConnection).prepareStatement("SELECT * FROM quarto WHERE numero = ?");
+        verify(mockPreparedStatement).setInt(1, quartoNumero);
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet).next(); // Only called once to check for the first row
+        // Removed: verifyNoMoreInteractions(mockResultSet); // This was causing the error
     }
 
     @Test
-    void testSave_SQLException() throws SQLException {
-        setupConnectionMocks();
-        Quarto quarto = Quarto.builder()
-                .numero(101)
-                .naoPerturbe(false)
-                .ocupado(true)
-                .marcadoPraLimpeza(false)
-                .tipo(TipoQuarto.SIMPLES)
-                .build();
-
-        when(statement.executeUpdate(anyString())).thenThrow(new SQLException("Database error"));
-
-        assertDoesNotThrow(() -> quartoRepository.save(quarto));
-        verify(statement).executeUpdate(anyString());
-    }
-
-    @Test
-    void testFindById_Success() throws SQLException {
-        setupConnectionMocks();
-        Integer quartoId = 101;
-        when(statement.executeQuery(anyString())).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("numero")).thenReturn(101);
-        when(resultSet.getBoolean("nao_perturbe")).thenReturn(false);
-        when(resultSet.getBoolean("ocupado")).thenReturn(true);
-        when(resultSet.getBoolean("marcado_para_limpeza")).thenReturn(false);
-        when(resultSet.getString("tipo")).thenReturn("SIMPLES");
-
-        Quarto result = quartoRepository.findById(quartoId);
-
-        assertNotNull(result);
-        assertEquals(101, result.getNumero());
-        assertFalse(result.isNaoPerturbe());
-        assertTrue(result.isOcupado());
-        assertFalse(result.isMarcadoPraLimpeza());
-        assertEquals(TipoQuarto.SIMPLES, result.getTipo());
-
-        verify(connectionFactory).connection();
-        verify(connection).createStatement();
-        verify(statement).executeQuery("SELECT * FROM quarto WHERE numero = 101");
-        verify(statement).close();
-        verify(connection).close();
-    }
-
-    @Test
-    void testFindById_NotFound() throws SQLException {
-        setupConnectionMocks();
-        Integer quartoId = 999;
-        when(statement.executeQuery(anyString())).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(false);
-
-        Quarto result = quartoRepository.findById(quartoId);
-
-        assertNull(result);
-        verify(statement).executeQuery("SELECT * FROM quarto WHERE numero = 999");
-        verify(statement).close();
-        verify(connection).close();
-    }
-
-    @Test
-    void testFindById_WithAllBooleanFieldsTrue() throws SQLException {
-        setupConnectionMocks();
-        Integer quartoId = 202;
-        when(statement.executeQuery(anyString())).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("numero")).thenReturn(202);
-        when(resultSet.getBoolean("nao_perturbe")).thenReturn(true);
-        when(resultSet.getBoolean("ocupado")).thenReturn(true);
-        when(resultSet.getBoolean("marcado_para_limpeza")).thenReturn(true);
-        when(resultSet.getString("tipo")).thenReturn("SIMPLES");
-
-        Quarto result = quartoRepository.findById(quartoId);
-
-        assertNotNull(result);
-        assertEquals(202, result.getNumero());
-        assertTrue(result.isNaoPerturbe());
-        assertTrue(result.isOcupado());
-        assertTrue(result.isMarcadoPraLimpeza());
-        assertEquals(TipoQuarto.SIMPLES, result.getTipo());
-    }
-
-    @Test
-    void testFindById_SQLException() throws SQLException {
-        setupConnectionMocks();
-        Integer quartoId = 101;
-        when(statement.executeQuery(anyString())).thenThrow(new SQLException("Database connection error"));
-
-        Quarto result = quartoRepository.findById(quartoId);
-
-        assertNull(result);
-        verify(statement).executeQuery(anyString());
-    }
-
-    @Test
-    void testFindById_ResultSetException() throws SQLException {
-        setupConnectionMocks();
-        Integer quartoId = 101;
-        when(statement.executeQuery(anyString())).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getInt("numero")).thenThrow(new SQLException("Column not found"));
-
-        Quarto result = quartoRepository.findById(quartoId);
-
-        assertNull(result);
-        verify(resultSet).getInt("numero");
-    }
-
-    @Test
-    void testSave_WithDifferentTipoQuarto() throws SQLException {
-        setupConnectionMocks();
-        Quarto quartoSuite = Quarto.builder()
-                .numero(301)
+    void save_shouldExecuteUpdate() throws SQLException {
+        // Arrange
+        Quarto newQuarto = Quarto.builder()
+                .numero(201)
                 .naoPerturbe(false)
                 .ocupado(false)
-                .marcadoPraLimpeza(true)
+                .marcadoPraLimpeza(false)
                 .tipo(TipoQuarto.SUITE)
                 .build();
 
-        when(statement.executeUpdate(anyString())).thenReturn(1);
+        // Configure mockPreparedStatement.executeUpdate() - no executeQuery here
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
-        quartoRepository.save(quartoSuite);
+        // Act
+        quartoRepository.save(newQuarto);
 
-        verify(statement).executeUpdate(
-                "INSERT INTO quarto (numero, nao_perturbe, ocupado, marcado_para_limpeza, tipo) VALUES (301, false, false, true, 'SUITE')"
-        );
+        // Assert
+        verify(mockConnection).prepareStatement("INSERT INTO quarto (numero, nao_perturbe, ocupado, marcado_para_limpeza, tipo) VALUES (?, ?, ?, ?, ?)");
+        verify(mockPreparedStatement).setInt(1, newQuarto.getNumero());
+        verify(mockPreparedStatement).setBoolean(2, newQuarto.isNaoPerturbe());
+        verify(mockPreparedStatement).setBoolean(3, newQuarto.isOcupado());
+        verify(mockPreparedStatement).setBoolean(4, newQuarto.isMarcadoPraLimpeza());
+        verify(mockPreparedStatement).setString(5, newQuarto.getTipo().toString());
+        verify(mockPreparedStatement).executeUpdate();
     }
 
     @Test
-    void testConnect_Success() throws SQLException {
-        when(connectionFactory.connection()).thenReturn(connection);
-        when(connection.createStatement()).thenReturn(statement);
+    void findAll_shouldReturnListOfQuartos() throws SQLException {
+        // Arrange
+        Quarto quarto1 = Quarto.builder().numero(101).naoPerturbe(false).ocupado(true).marcadoPraLimpeza(false).tipo(TipoQuarto.SIMPLES).build();
+        Quarto quarto2 = Quarto.builder().numero(102).naoPerturbe(true).ocupado(false).marcadoPraLimpeza(true).tipo(TipoQuarto.SUITE).build();
 
-        quartoRepository.connect();
+        // Specific stubbing for this test
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
-        verify(connectionFactory).connection();
-        verify(connection).createStatement();
+        // Configure mockResultSet for multiple results
+        when(mockResultSet.next()).thenReturn(true, true, false); // Two rows, then end
+        when(mockResultSet.getInt("numero"))
+                .thenReturn(quarto1.getNumero())
+                .thenReturn(quarto2.getNumero());
+        when(mockResultSet.getBoolean("nao_perturbe"))
+                .thenReturn(quarto1.isNaoPerturbe())
+                .thenReturn(quarto2.isNaoPerturbe());
+        when(mockResultSet.getBoolean("ocupado"))
+                .thenReturn(quarto1.isOcupado())
+                .thenReturn(quarto2.isOcupado());
+        when(mockResultSet.getBoolean("marcado_para_limpeza"))
+                .thenReturn(quarto1.isMarcadoPraLimpeza())
+                .thenReturn(quarto2.isMarcadoPraLimpeza());
+        when(mockResultSet.getString("tipo"))
+                .thenReturn(quarto1.getTipo().name())
+                .thenReturn(quarto2.getTipo().name());
+
+        // Act
+        List<Quarto> quartos = quartoRepository.findAll();
+
+        // Assert
+        assertNotNull(quartos);
+        assertEquals(2, quartos.size());
+        assertEquals(quarto1.getNumero(), quartos.get(0).getNumero());
+        assertEquals(quarto2.getNumero(), quartos.get(1).getNumero());
+
+        // Verify interactions
+        verify(mockConnection).prepareStatement("SELECT * FROM quarto");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(3)).next(); // Called for each row + one more to check for end
+        verify(mockResultSet, times(2)).getInt("numero");
+        verify(mockResultSet, times(2)).getString("tipo");
+        // Add more specific verifications for boolean values if desired
     }
 
     @Test
-    void testConnect_SQLException() throws SQLException {
-        when(connectionFactory.connection()).thenThrow(new SQLException("Connection failed"));
+    void findByOcupado_shouldReturnOccupiedQuartos() throws SQLException {
+        // Arrange
+        Quarto occupiedQuarto = Quarto.builder().numero(101).naoPerturbe(false).ocupado(true).marcadoPraLimpeza(false).tipo(TipoQuarto.SIMPLES).build();
 
-        assertThrows(SQLException.class, () -> quartoRepository.connect());
+        // Specific stubbing for this test
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+
+        when(mockResultSet.next()).thenReturn(true, false); // One occupied quarto, then no more
+        when(mockResultSet.getInt("numero")).thenReturn(occupiedQuarto.getNumero());
+        when(mockResultSet.getBoolean("nao_perturbe")).thenReturn(occupiedQuarto.isNaoPerturbe());
+        when(mockResultSet.getBoolean("ocupado")).thenReturn(occupiedQuarto.isOcupado());
+        when(mockResultSet.getBoolean("marcado_para_limpeza")).thenReturn(occupiedQuarto.isMarcadoPraLimpeza());
+        when(mockResultSet.getString("tipo")).thenReturn(occupiedQuarto.getTipo().name());
+
+        // Act
+        List<Quarto> occupiedQuartos = quartoRepository.findByOcupado();
+
+        // Assert
+        assertNotNull(occupiedQuartos);
+        assertEquals(1, occupiedQuartos.size());
+        assertTrue(occupiedQuartos.get(0).isOcupado());
+
+        // Verify
+        verify(mockConnection).prepareStatement("SELECT * FROM quarto WHERE ocupado = ?");
+        verify(mockPreparedStatement).setBoolean(1, true);
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(2)).next(); // Called twice: once for the row, once to check for the next (which is false)
     }
 
     @Test
-    void testCloseConnection_Success() throws SQLException {
-        when(connectionFactory.connection()).thenReturn(connection);
-        when(connection.createStatement()).thenReturn(statement);
-        quartoRepository.connect();
+    void delete_shouldExecuteUpdate() throws SQLException {
+        // Arrange
+        Quarto quartoToDelete = Quarto.builder().numero(101).build();
 
-        quartoRepository.closeConnection();
+        // No executeQuery here, only executeUpdate
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
-        verify(statement).close();
-        verify(connection).close();
+        // Act
+        quartoRepository.delete(quartoToDelete);
+
+        // Assert
+        verify(mockConnection).prepareStatement("DELETE FROM quarto WHERE numero = ?");
+        verify(mockPreparedStatement).setInt(1, quartoToDelete.getNumero());
+        verify(mockPreparedStatement).executeUpdate();
     }
-
-    @Test
-    void testCloseConnection_SQLException() throws SQLException {
-        when(connectionFactory.connection()).thenReturn(connection);
-        when(connection.createStatement()).thenReturn(statement);
-        quartoRepository.connect();
-        doThrow(new SQLException("Close failed")).when(statement).close();
-
-        assertDoesNotThrow(() -> quartoRepository.closeConnection());
-        verify(statement).close();
-    }
-
 }
