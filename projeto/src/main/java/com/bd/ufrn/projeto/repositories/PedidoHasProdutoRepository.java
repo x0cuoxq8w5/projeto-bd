@@ -2,7 +2,6 @@ package com.bd.ufrn.projeto.repositories;
 
 import com.bd.ufrn.projeto.models.PedidoHasProduto;
 import com.bd.ufrn.projeto.services.ConnectionFactory;
-import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,103 +22,57 @@ public class PedidoHasProdutoRepository extends AbstractRepository<PedidoHasProd
     }
 
     public PedidoHasProduto findByPedidoIdAndProdutoId(Integer idPedido, Integer idProduto) {
-        PedidoHasProduto pedidoHasProduto = null;
         String sql = "SELECT id_pedido, id_produto, preco_item FROM pedido_has_produto WHERE id_pedido = ? AND id_produto = ?";
         try (Connection connection = connectionFactory.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, idPedido);
-            preparedStatement.setInt(2, idProduto);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    pedidoHasProduto = mapResultSetToPedidoHasProduto(resultSet);
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, idPedido);
+            ps.setInt(2, idProduto);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToPedidoHasProduto(rs);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return pedidoHasProduto;
+        return null;
     }
 
-    private PedidoHasProduto mapResultSetToPedidoHasProduto(ResultSet resultSet) throws SQLException {
+    private PedidoHasProduto mapResultSetToPedidoHasProduto(ResultSet rs) throws SQLException {
         return PedidoHasProduto.builder()
-                .idPedido(resultSet.getInt("id_pedido"))
-                .idProduto(resultSet.getInt("id_produto"))
-                .precoItem(resultSet.getDouble("preco_item"))
+                .idPedido(rs.getInt("id_pedido"))
+                .idProduto(rs.getInt("id_produto"))
+                .precoItem(rs.getDouble("preco_item"))
                 .build();
     }
 
     @Override
     public void save(PedidoHasProduto pedidoHasProduto) {
-        Connection connection = null;
-        try {
-            connection = connectionFactory.connection();
-            connection.setAutoCommit(false);
+        String sql = "INSERT INTO pedido_has_produto (id_pedido, id_produto, preco_item) VALUES (?, ?, ?) ";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            String sql = "INSERT INTO pedido_has_produto (id_pedido, id_produto, preco_item) VALUES (?, ?, ?) " +
-                    "ON DUPLICATE KEY UPDATE preco_item = VALUES(preco_item)";
+            ps.setInt(1, pedidoHasProduto.getIdPedido());
+            ps.setInt(2, pedidoHasProduto.getIdProduto());
+            ps.setDouble(3, pedidoHasProduto.getPrecoItem());
+            ps.executeUpdate();
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                preparedStatement.setInt(1, pedidoHasProduto.getIdPedido());
-                preparedStatement.setInt(2, pedidoHasProduto.getIdProduto());
-                preparedStatement.setDouble(3, pedidoHasProduto.getPrecoItem());
-                preparedStatement.executeUpdate();
-            }
-
-            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
-
     public void deleteByPedidoIdAndProdutoId(Integer idPedido, Integer idProduto) {
-        Connection connection = null;
-        try {
-            connection = connectionFactory.connection();
-            connection.setAutoCommit(false);
+        String sql = "DELETE FROM pedido_has_produto WHERE id_pedido = ? AND id_produto = ?";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            String sql = "DELETE FROM pedido_has_produto WHERE id_pedido = ? AND id_produto = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                preparedStatement.setInt(1, idPedido);
-                preparedStatement.setInt(2, idProduto);
-                preparedStatement.executeUpdate();
-            }
+            ps.setInt(1, idPedido);
+            ps.setInt(2, idProduto);
+            ps.executeUpdate();
 
-            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
@@ -136,27 +89,28 @@ public class PedidoHasProdutoRepository extends AbstractRepository<PedidoHasProd
         List<PedidoHasProduto> list = new ArrayList<>();
         String sql = "SELECT id_pedido, id_produto, preco_item FROM pedido_has_produto";
         try (Connection connection = connectionFactory.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    list.add(mapResultSetToPedidoHasProduto(resultSet));
-                }
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapResultSetToPedidoHasProduto(rs));
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return list;
     }
 
-     public List<PedidoHasProduto> findByPedidoId(Integer idPedido) {
+    public List<PedidoHasProduto> findByPedidoId(Integer idPedido) {
         List<PedidoHasProduto> list = new ArrayList<>();
         String sql = "SELECT id_pedido, id_produto, preco_item FROM pedido_has_produto WHERE id_pedido = ?";
         try (Connection connection = connectionFactory.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, idPedido);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    list.add(mapResultSetToPedidoHasProduto(resultSet));
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, idPedido);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSetToPedidoHasProduto(rs));
                 }
             }
         } catch (SQLException e) {
@@ -169,11 +123,11 @@ public class PedidoHasProdutoRepository extends AbstractRepository<PedidoHasProd
         List<PedidoHasProduto> list = new ArrayList<>();
         String sql = "SELECT id_pedido, id_produto, preco_item FROM pedido_has_produto WHERE id_produto = ?";
         try (Connection connection = connectionFactory.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, idProduto);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    list.add(mapResultSetToPedidoHasProduto(resultSet));
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, idProduto);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSetToPedidoHasProduto(rs));
                 }
             }
         } catch (SQLException e) {
