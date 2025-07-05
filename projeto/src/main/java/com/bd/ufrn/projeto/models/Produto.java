@@ -9,6 +9,6 @@ import lombok.Setter;
 @Builder
 public class Produto {
     private int id;
-    private double preco_atual;
+    private double precoAtual;
     private int quantidade;
 }

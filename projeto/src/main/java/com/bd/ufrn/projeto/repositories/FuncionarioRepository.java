@@ -70,24 +70,21 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
 
     @Override
     public void save(Funcionario funcionario) {
-        Connection connection = null;
-        try {
-            connection = connectionFactory.connection();
+        try (Connection connection = connectionFactory.connection()) {
             connection.setAutoCommit(false);
 
-            // Save Funcionario data
-            String funcionarioSql = "INSERT INTO funcionario (cpf, nome_sobrenome, data_nasc, num_funcionario, administrador) VALUES (?, ?, ?)";
+            // Save Funcionario
+            String funcionarioSql = "INSERT INTO funcionario (cpf, nome_sobrenome, data_nasc, num_funcionario, administrador) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement funcionarioStatement = connection.prepareStatement(funcionarioSql)) {
                 funcionarioStatement.setInt(1, funcionario.getCpf());
                 funcionarioStatement.setString(2, funcionario.getNome());
                 funcionarioStatement.setTimestamp(3, Timestamp.valueOf(funcionario.getDataNascimento()));
-                funcionarioStatement.setInt(1, funcionario.getCpf());
-                funcionarioStatement.setInt(2, funcionario.getNumFuncionario());
-                funcionarioStatement.setBoolean(3, funcionario.isAdministrador());
+                funcionarioStatement.setInt(4, funcionario.getNumFuncionario());
+                funcionarioStatement.setBoolean(5, funcionario.isAdministrador());
                 funcionarioStatement.executeUpdate();
             }
 
-            // Save Funcionario's Papeis
+            // Save Papeis
             if (funcionario.getPapeis() != null && !funcionario.getPapeis().isEmpty()) {
                 String papelSql = "INSERT INTO papel (cpf, papel) VALUES (?, ?)";
                 try (PreparedStatement papelStatement = connection.prepareStatement(papelSql)) {
@@ -103,24 +100,9 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
+
 
     @Override
     public void delete(Funcionario entity) {
@@ -129,18 +111,18 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
             connection = connectionFactory.connection();
             connection.setAutoCommit(false);
 
-            // Delete Funcionario's Papeis first
+            // Delete Papeis
             String deletePapelSql = "DELETE FROM papel WHERE cpf = ?";
             try (PreparedStatement deletePapelStatement = connection.prepareStatement(deletePapelSql)) {
                 deletePapelStatement.setInt(1, entity.getCpf());
                 deletePapelStatement.executeUpdate();
             }
 
-            // Delete Funcionario data
-            String funcionarioSql = "DELETE FROM funcionario WHERE cpf = ?";
-            try (PreparedStatement funcionarioStatement = connection.prepareStatement(funcionarioSql)) {
-                funcionarioStatement.setInt(1, entity.getCpf());
-                funcionarioStatement.executeUpdate();
+            // Delete Funcionario
+            String deleteFuncionarioSql = "DELETE FROM funcionario WHERE cpf = ?";
+            try (PreparedStatement deleteFuncionarioStatement = connection.prepareStatement(deleteFuncionarioSql)) {
+                deleteFuncionarioStatement.setInt(1, entity.getCpf());
+                deleteFuncionarioStatement.executeUpdate();
             }
 
             connection.commit();
@@ -149,39 +131,46 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
             if (connection != null) {
                 try {
                     connection.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
                 }
             }
         } finally {
             if (connection != null) {
                 try {
-                    connection.setAutoCommit(true); 
+                    connection.setAutoCommit(true);
                     connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                } catch (SQLException closeEx) {
+                    closeEx.printStackTrace();
                 }
             }
         }
     }
 
+
     @Override
     public List<Funcionario> findAll() {
         List<Funcionario> funcionarios = new ArrayList<>();
-        String sql = "SELECT f.num_funcionario, f.administrador FROM funcionario f WHERE f.cpf = ?";
+        String sql = "SELECT cpf, nome_sobrenome, data_nasc, num_funcionario, administrador FROM funcionario";
+
         try (Connection connection = connectionFactory.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Funcionario funcionario = mapResultSetToFuncionario(resultSet);
-                    // Fetch papeis for each funcionario
-                    funcionario.setPapeis(findPapeisByCpf(connection, funcionario.getCpf()));
-                    funcionarios.add(funcionario);
-                }
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Funcionario funcionario = mapResultSetToFuncionario(resultSet);
+
+                // Fetch and set papeis
+                funcionario.setPapeis(findPapeisByCpf(connection, funcionario.getCpf()));
+
+                funcionarios.add(funcionario);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return funcionarios;
     }
+
 }

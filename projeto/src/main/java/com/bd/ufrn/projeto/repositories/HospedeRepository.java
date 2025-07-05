@@ -12,10 +12,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
 public class HospedeRepository extends AbstractRepository<Hospede> implements StrongEntity<Hospede, Integer> {
+
     private final ConnectionFactory connectionFactory;
 
     @Autowired
@@ -23,127 +25,70 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
         this.connectionFactory = connectionFactory;
     }
 
-    // Retrieve a Hospede by CPF
     @Override
     public Hospede findById(Integer cpf) {
-        Hospede hospede = null;
-        String sql = "SELECT * FROM hospede WHERE cpf = ?";
+        String sql = "SELECT cpf, nome_sobrenome, data_nasc FROM hospede WHERE cpf = ?";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, cpf);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    hospede = mapResultSetToHospede(resultSet);
+                    return mapResultSetToHospede(resultSet);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return hospede;
+        return null;
     }
 
-    // Helper method to convert ResultSet into a Hospede object
     private Hospede mapResultSetToHospede(ResultSet resultSet) throws SQLException {
-        Hospede hospede = Hospede.builder().build();
-        hospede.setCpf(resultSet.getInt("cpf"));
-        hospede.setNome(resultSet.getString("nome_sobrenome"));
-        hospede.setDataNascimento(resultSet.getTimestamp("data_nasc").toLocalDateTime());
-        return hospede;
+        return Hospede.builder()
+                .cpf(resultSet.getInt("cpf"))
+                .nome(resultSet.getString("nome_sobrenome"))
+                .dataNascimento(resultSet.getTimestamp("data_nasc").toLocalDateTime())
+                .build();
     }
 
-    // Save a new Hospede to the database
     @Override
     public void save(Hospede hospede) {
-        Connection connection = null;
-        try {
-            connection = connectionFactory.connection();
-            connection.setAutoCommit(false);
-
-            // Insert into 'hospede' table
-            String pessoaSql = "INSERT INTO hospede (cpf, nome_sobrenome, data_nasc) VALUES (?, ?, ?)";
-            try (PreparedStatement pessoaStatement = connection.prepareStatement(pessoaSql)) {
-                pessoaStatement.setInt(1, hospede.getCpf());
-                pessoaStatement.setString(2, hospede.getNome());
-                pessoaStatement.setTimestamp(3, Timestamp.valueOf(hospede.getDataNascimento()));
-                pessoaStatement.executeUpdate();
-            }
-            connection.commit();
+        String sql = "INSERT INTO hospede (cpf, nome_sobrenome, data_nasc) VALUES (?, ?, ?)";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, hospede.getCpf());
+            preparedStatement.setString(2, hospede.getNome());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(hospede.getDataNascimento()));
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Roll back in case of error
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        } finally {
-            // Clean up and reset connection state
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
-    // Delete a Hospede (and associated Pessoa) from the database
     @Override
-    public void delete(Hospede entity) {
-        Connection connection = null;
-        try {
-            connection = connectionFactory.connection();
-            connection.setAutoCommit(false);
-
-
-            String hospedeSql = "DELETE FROM hospede WHERE cpf = ?";
-            try (PreparedStatement hospedeStatement = connection.prepareStatement(hospedeSql)) {
-                hospedeStatement.setInt(1, entity.getCpf());
-                hospedeStatement.executeUpdate();
-            }
-
-            connection.commit();
+    public void delete(Hospede hospede) {
+        String sql = "DELETE FROM hospede WHERE cpf = ?";
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, hospede.getCpf());
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Roll back in case of error
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        } finally {
-            // Clean up and reset connection state
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
-    // Retrieve all Hospedes from the database
     @Override
     public List<Hospede> findAll() {
         List<Hospede> hospedes = new ArrayList<>();
-        String sql = "SELECT * FROM hospede";
+        String sql = "SELECT cpf, nome_sobrenome, data_nasc FROM hospede";
         try (Connection connection = connectionFactory.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    hospedes.add(mapResultSetToHospede(resultSet));
-                }
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                hospedes.add(mapResultSetToHospede(resultSet));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return Collections.emptyList();
         }
         return hospedes;
     }
