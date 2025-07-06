@@ -4,7 +4,7 @@ import com.bd.ufrn.projeto.interfaces.StrongEntity;
 import com.bd.ufrn.projeto.models.Pessoa;
 
 import java.util.List;
-
+//remover
 public class PessoaRepository extends AbstractRepository<Pessoa> implements StrongEntity<Pessoa,Integer> {
 
     @Override

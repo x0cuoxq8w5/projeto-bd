@@ -10,12 +10,14 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class Reserva {
-    private int id;
-    private int cpfCliente; //mesma coisa que pedido
+    private Integer id;
+    private Hospede hospede;
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
     private LocalDateTime dataEntrada;
     private LocalDateTime dataSaida;
+    private Boolean validada;
+    private LocalDateTime dataInicioCheckin;
     private int idCheckin;
-    private int numQuarto;
+    private Quarto quarto;
 }
