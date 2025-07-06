@@ -44,7 +44,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
 
     private Hospede mapResultSetToHospede(ResultSet resultSet) throws SQLException {
         return Hospede.builder()
-                .cpf(resultSet.getInt("cpf"))
+                .cpf(resultSet.getString("cpf"))
                 .nome(resultSet.getString("nome_sobrenome"))
                 .dataNascimento(resultSet.getTimestamp("data_nasc").toLocalDateTime())
                 .build();
@@ -55,7 +55,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
         String sql = "INSERT INTO hospede (cpf, nome_sobrenome, data_nasc) VALUES (?, ?, ?)";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, hospede.getCpf());
+            preparedStatement.setString(1, hospede.getCpf());
             preparedStatement.setString(2, hospede.getNome());
             preparedStatement.setTimestamp(3, Timestamp.valueOf(hospede.getDataNascimento()));
             preparedStatement.executeUpdate();
@@ -69,7 +69,7 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
         String sql = "DELETE FROM hospede WHERE cpf = ?";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, hospede.getCpf());
+            preparedStatement.setString(1, hospede.getCpf());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
