@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class Pessoa {
-    protected int cpf;
+    protected String cpf;
     protected LocalDateTime dataNascimento;
     protected String nome;
 }

@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class Limpeza {
-    private int idEquipe;
-    private int numQuarto;
+    private Integer id;
+    private EquipeLimpeza equipeLimpeza;
+    private Quarto quarto;
     private LocalDateTime data;
 }

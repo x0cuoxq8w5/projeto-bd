@@ -44,11 +44,11 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
         return funcionario;
     }
 
-    private List<Papel> findPapeisByCpf(Connection connection, int cpf) throws SQLException {
+    private List<Papel> findPapeisByCpf(Connection connection, String cpf) throws SQLException {
         List<Papel> papeis = new ArrayList<>();
         String sql = "SELECT papel FROM papel WHERE cpf = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, cpf);
+            preparedStatement.setString(1, cpf);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     papeis.add(Papel.valueOf(resultSet.getString("papel")));
@@ -60,7 +60,7 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
 
     private Funcionario mapResultSetToFuncionario(ResultSet resultSet) throws SQLException {
         return Funcionario.builder()
-                .cpf(resultSet.getInt("cpf"))
+                .cpf(resultSet.getString("cpf"))
                 .nome(resultSet.getString("nome_sobrenome"))
                 .dataNascimento(resultSet.getTimestamp("data_nasc").toLocalDateTime())
                 .numFuncionario(resultSet.getInt("num_funcionario"))
@@ -76,7 +76,7 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
             // Save Funcionario
             String funcionarioSql = "INSERT INTO funcionario (cpf, nome_sobrenome, data_nasc, num_funcionario, administrador) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement funcionarioStatement = connection.prepareStatement(funcionarioSql)) {
-                funcionarioStatement.setInt(1, funcionario.getCpf());
+                funcionarioStatement.setString(1, funcionario.getCpf());
                 funcionarioStatement.setString(2, funcionario.getNome());
                 funcionarioStatement.setTimestamp(3, Timestamp.valueOf(funcionario.getDataNascimento()));
                 funcionarioStatement.setInt(4, funcionario.getNumFuncionario());
@@ -89,7 +89,7 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
                 String papelSql = "INSERT INTO papel (cpf, papel) VALUES (?, ?)";
                 try (PreparedStatement papelStatement = connection.prepareStatement(papelSql)) {
                     for (Papel papel : funcionario.getPapeis()) {
-                        papelStatement.setInt(1, funcionario.getCpf());
+                        papelStatement.setString(1, funcionario.getCpf());
                         papelStatement.setString(2, papel.name());
                         papelStatement.addBatch();
                     }
@@ -114,14 +114,14 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
             // Delete Papeis
             String deletePapelSql = "DELETE FROM papel WHERE cpf = ?";
             try (PreparedStatement deletePapelStatement = connection.prepareStatement(deletePapelSql)) {
-                deletePapelStatement.setInt(1, entity.getCpf());
+                deletePapelStatement.setString(1, entity.getCpf());
                 deletePapelStatement.executeUpdate();
             }
 
             // Delete Funcionario
             String deleteFuncionarioSql = "DELETE FROM funcionario WHERE cpf = ?";
             try (PreparedStatement deleteFuncionarioStatement = connection.prepareStatement(deleteFuncionarioSql)) {
-                deleteFuncionarioStatement.setInt(1, entity.getCpf());
+                deleteFuncionarioStatement.setString(1, entity.getCpf());
                 deleteFuncionarioStatement.executeUpdate();
             }
 

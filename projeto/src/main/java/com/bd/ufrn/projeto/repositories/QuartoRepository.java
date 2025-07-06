@@ -54,7 +54,7 @@ public class QuartoRepository extends AbstractRepository<Quarto> implements Stro
             preparedStatement.setInt(1, quarto.getNumero());
             preparedStatement.setBoolean(2, quarto.isNaoPerturbe());
             preparedStatement.setBoolean(3, quarto.isOcupado());
-            preparedStatement.setBoolean(4, quarto.isMarcadoPraLimpeza());
+            preparedStatement.setBoolean(4, quarto.isMarcadoParaLimpeza());
             preparedStatement.setString(5, quarto.getTipo().name());
             preparedStatement.executeUpdate();
 
@@ -166,7 +166,7 @@ public class QuartoRepository extends AbstractRepository<Quarto> implements Stro
                 .numero(resultSet.getInt("numero"))
                 .naoPerturbe(resultSet.getBoolean("nao_perturbe"))
                 .ocupado(resultSet.getBoolean("ocupado"))
-                .marcadoPraLimpeza(resultSet.getBoolean("marcado_para_limpeza"))
+                .marcadoParaLimpeza(resultSet.getBoolean("marcado_para_limpeza"))
                 .tipo(TipoQuarto.valueOf(resultSet.getString("tipo")))
                 .build();
     }

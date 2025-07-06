@@ -12,7 +12,6 @@ public class Quarto {
     private int numero;
     private boolean naoPerturbe;
     private boolean ocupado;
-    private boolean marcadoPraLimpeza;
+    private boolean marcadoParaLimpeza;
     private TipoQuarto tipo;
-
 }

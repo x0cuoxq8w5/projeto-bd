@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+// remover
 @Repository
 public class PedidoHasProdutoRepository extends AbstractRepository<PedidoHasProduto> {
     private final ConnectionFactory connectionFactory;
