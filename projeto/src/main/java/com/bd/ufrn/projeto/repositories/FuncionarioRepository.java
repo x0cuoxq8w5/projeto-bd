@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class FuncionarioRepository extends AbstractRepository<Funcionario> implements StrongEntity<Funcionario, Integer> {
+public class FuncionarioRepository extends AbstractRepository<Funcionario> implements StrongEntity<Funcionario, String> {
     private final ConnectionFactory connectionFactory;
 
     @Autowired
@@ -25,12 +25,12 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
     }
 
     @Override
-    public Funcionario findById(Integer cpf) {
+    public Funcionario findById(String cpf) { //esqueceu de mudar aqui
         Funcionario funcionario = null;
         String sql = "SELECT f.* FROM funcionario f WHERE f.cpf = ?";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, cpf);
+            preparedStatement.setString(1, cpf); //esqueceu de mudar aqui tambem
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     funcionario = mapResultSetToFuncionario(resultSet);

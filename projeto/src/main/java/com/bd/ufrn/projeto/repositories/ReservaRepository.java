@@ -115,13 +115,13 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
         boolean isInsert = (reserva.getId() == null);
 
         String insertSql = """
-            INSERT INTO reserva (cpf, data_inicio, data_fim, data_entrada, data_saida, validada, data_inicio_checkin, id_checkin, numero)
+            INSERT INTO reserva (cpf, data_inicio, data_fim, data_entrada, data_saida, numero)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         String updateSql = """
             UPDATE reserva
-            SET cpf = ?, data_inicio = ?, data_fim = ?, data_entrada = ?, data_saida = ?, validada = ?, data_inicio_checkin = ?, id_checkin = ?, numero = ?
+            SET cpf = ?, data_inicio = ?, data_fim = ?, data_entrada = ?, data_saida = ?, numero = ?
             WHERE id_reserva = ?
         """;
 
@@ -157,13 +157,10 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
         stmt.setTimestamp(3, toTimestamp(r.getDataFim()));
         stmt.setTimestamp(4, toTimestamp(r.getDataEntrada()));
         stmt.setTimestamp(5, toTimestamp(r.getDataSaida()));
-        stmt.setBoolean(6, r.getValidada() != null && r.getValidada());
-        stmt.setTimestamp(7, toTimestamp(r.getDataInicioCheckin()));
-        stmt.setInt(8, r.getIdCheckin());
-        stmt.setInt(9, r.getQuarto().getNumero());
+        stmt.setInt(6, r.getQuarto().getNumero());
 
         if (includeId) {
-            stmt.setInt(10, r.getId());
+            stmt.setInt(7, r.getId());
         }
     }
 
@@ -190,9 +187,6 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
                 .dataFim(toLDT(rs.getTimestamp("data_fim")))
                 .dataEntrada(toLDT(rs.getTimestamp("data_entrada")))
                 .dataSaida(toLDT(rs.getTimestamp("data_saida")))
-                .validada(rs.getBoolean("validada"))
-                .dataInicioCheckin(toLDT(rs.getTimestamp("data_inicio_checkin")))
-                .idCheckin(rs.getInt("id_checkin"))
                 .build();
     }
 

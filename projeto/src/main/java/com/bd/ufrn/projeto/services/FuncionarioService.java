@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class FuncionarioService implements CrudService<Funcionario, FuncionarioDTO, Integer> {
+public class FuncionarioService implements CrudService<Funcionario, FuncionarioDTO, String> {
     @Autowired private FuncionarioRepository funcionarioRepository;
 
 
     @Override
-    public Funcionario get(Integer id) {
+    public Funcionario get(String id) {
         return funcionarioRepository.findById(id);
     }
 
@@ -33,13 +33,20 @@ public class FuncionarioService implements CrudService<Funcionario, FuncionarioD
     }
 
     @Override
-    public void update(Integer id, FuncionarioDTO funcionarioDTO) {
+    public void update(String id, FuncionarioDTO funcionarioDTO) {
+        Funcionario funcionario = get(id);
+        if(funcionarioDTO.nome() != null) funcionario.setNome(funcionarioDTO.nome());
+        if(funcionarioDTO.numFuncionario() != null) funcionario.setNumFuncionario(funcionarioDTO.numFuncionario());
+        if(funcionarioDTO.administrador() != null) funcionario.setAdministrador(funcionarioDTO.administrador());
+        if(funcionarioDTO.papeis() != null) funcionario.setPapeis(funcionarioDTO.papeis());
+        funcionarioRepository.save(funcionario);
 
     }
 
     @Override
-    public void delete(Integer id) {
-
+    public void delete(String id) {
+        Funcionario funcionario = get(id);
+        funcionarioRepository.delete(funcionario);
     }
 
     @Override

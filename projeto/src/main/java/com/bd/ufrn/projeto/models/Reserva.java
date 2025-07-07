@@ -16,8 +16,5 @@ public class Reserva {
     private LocalDateTime dataFim;
     private LocalDateTime dataEntrada;
     private LocalDateTime dataSaida;
-    private Boolean validada;
-    private LocalDateTime dataInicioCheckin;
-    private int idCheckin;
     private Quarto quarto;
 }

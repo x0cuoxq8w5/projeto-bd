@@ -19,7 +19,7 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
 
     @Override
     public Pedido get(Integer id) {
-        return null;
+        return pedidoRepository.findById(id);
     }
 
     @Override
@@ -35,12 +35,14 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
 
     @Override
     public void update(Integer id, PedidoDTO pedidoDTO) {
-
+        Pedido pedido = get(id);
+        if (pedidoDTO.dataEntrega() != null) pedido.setDataEntrega(pedidoDTO.dataEntrega());
     }
 
     @Override
     public void delete(Integer id) {
-
+        Pedido pedido = get(id);
+        pedidoRepository.delete(pedido);
     }
 
     @Override

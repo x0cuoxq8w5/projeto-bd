@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Repository
-public class HospedeRepository extends AbstractRepository<Hospede> implements StrongEntity<Hospede, Integer> {
+public class HospedeRepository extends AbstractRepository<Hospede> implements StrongEntity<Hospede, String> {
 
     private final ConnectionFactory connectionFactory;
 
@@ -26,11 +26,11 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
     }
 
     @Override
-    public Hospede findById(Integer cpf) {
+    public Hospede findById(String cpf) { //esqueceu aqui
         String sql = "SELECT cpf, nome_sobrenome, data_nasc FROM hospede WHERE cpf = ?";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, cpf);
+            preparedStatement.setString(1, cpf); //esqueceu aqui
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return mapResultSetToHospede(resultSet);

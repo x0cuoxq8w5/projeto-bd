@@ -15,7 +15,7 @@ public class HospedeService implements CrudService<Hospede,HospedeDTO,String> {
     private HospedeRepository hospedeRepository;
     @Override
     public Hospede get(String id) {
-        return null;
+        return hospedeRepository.findById(id);
     }
 
     @Override
@@ -30,12 +30,15 @@ public class HospedeService implements CrudService<Hospede,HospedeDTO,String> {
 
     @Override
     public void update(String id, HospedeDTO hospedeDTO) {
-
+        Hospede hospede = get(id);
+        if(hospedeDTO.nome() != null) hospede.setNome(hospedeDTO.nome());
+        hospedeRepository.save(hospede);
     }
 
     @Override
     public void delete(String id) {
-
+        Hospede hospede = get(id);
+        hospedeRepository.delete(hospede);
     }
 
     @Override

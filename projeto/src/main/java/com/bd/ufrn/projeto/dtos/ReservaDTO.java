@@ -4,12 +4,11 @@ import java.time.LocalDateTime;
 
 public record ReservaDTO(
         Integer id,
-        Integer cpfCliente,
+        String cpfCliente,
         LocalDateTime dataInicio,
         LocalDateTime dataFim,
         LocalDateTime dataEntrada,
         LocalDateTime dataSaida,
-        Integer idCheckin,
         Integer numQuarto
 ) {
 }

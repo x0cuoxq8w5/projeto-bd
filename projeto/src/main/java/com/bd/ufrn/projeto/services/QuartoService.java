@@ -15,26 +15,47 @@ public class QuartoService implements CrudService<Quarto, QuartoDTO,Integer> {
 
     @Override
     public Quarto get(Integer id) {
-        return null;
+        return quartoRepository.findById(id);
     }
 
     @Override
     public void create(QuartoDTO quartoDTO) {
-
+        Quarto quarto = Quarto.builder()
+                .numero(quartoDTO.numero())
+                .tipo(quartoDTO.tipo())
+                .naoPerturbe(false)
+                .ocupado(false)
+                .marcadoParaLimpeza(false)
+                .build();
+        quartoRepository.save(quarto);
     }
 
     @Override
     public void update(Integer id, QuartoDTO quartoDTO) {
-
+            Quarto quarto = get(id);
+            if(quartoDTO.tipo()!=null){
+                quarto.setTipo(quartoDTO.tipo());
+            }
+            if(quartoDTO.naoPerturbe() != null){
+                quarto.setNaoPerturbe(quartoDTO.naoPerturbe());
+            }
+            if(quartoDTO.ocupado() != null){
+                quarto.setOcupado(quartoDTO.ocupado());
+            }
+            if(quartoDTO.marcadoPraLimpeza() != null){
+                quarto.setMarcadoParaLimpeza(quartoDTO.marcadoPraLimpeza());
+            }
+            quartoRepository.save(quarto);
     }
 
     @Override
     public void delete(Integer id) {
-
+        Quarto quarto = get(id);
+        quartoRepository.delete(quarto);
     }
 
     @Override
     public List<Quarto> getAll() {
-        return List.of();
+        return quartoRepository.findAll();
     }
 }
