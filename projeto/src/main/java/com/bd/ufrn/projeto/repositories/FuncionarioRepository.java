@@ -173,4 +173,19 @@ public class FuncionarioRepository extends AbstractRepository<Funcionario> imple
         return funcionarios;
     }
 
+    //SELECT * FROM (funcionario LEFT OUTER JOIN equipe_limpeza_has_funionario) WHERE cpf = <cpf>
+    //Se encontrar retorna true caso contrário false
+    public boolean isCleaner() {
+        return false;
+    }
+
+    //SELECT * FROM (funcionario NATURAL JOIN papel) WHERE papel = <papel>
+
+    public List<Funcionario> findByPapel(Papel papel) {
+        return null;
+    }
+
+    //Talvez criar uma pra achar funcionários sem papel?
+    //Ou só não permitir funcionario que não tenha papel
+
 }
