@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/hospede")
 public class HospedeController implements GenericController<Hospede, HospedeDTO, String> {
     @Autowired
     HospedeService hospedeService;

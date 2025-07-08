@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/equipe-limpeza")
 public class EquipeLimpezaController implements GenericController<EquipeLimpeza, EquipeLimpezaDTO,Integer> {
     @Autowired EquipeLimpezaService equipeLimpezaService;
 

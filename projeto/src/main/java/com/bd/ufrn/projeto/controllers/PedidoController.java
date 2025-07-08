@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/pedido")
 public class PedidoController implements GenericController<Pedido, PedidoDTO, Integer> {
     @Autowired PedidoService pedidoService;
 

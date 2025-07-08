@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/quarto")
 public class QuartoController implements GenericController<Quarto,QuartoDTO,Integer> {
     @Autowired
     QuartoService quartoService;

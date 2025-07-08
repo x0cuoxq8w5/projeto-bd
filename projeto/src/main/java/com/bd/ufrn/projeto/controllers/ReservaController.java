@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("reserva")
 public class ReservaController implements GenericController<Reserva,ReservaDTO,Integer> {
     @Autowired
     ReservaService reservaService;
