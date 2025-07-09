@@ -4,6 +4,7 @@ import com.bd.ufrn.projeto.dtos.QuartoDTO;
 import com.bd.ufrn.projeto.interfaces.GenericController;
 import com.bd.ufrn.projeto.models.Quarto;
 import com.bd.ufrn.projeto.services.QuartoService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,5 +50,21 @@ public class QuartoController implements GenericController<Quarto,QuartoDTO,Inte
     public ResponseEntity<List<Quarto>> getAll() {
         List<Quarto> quarto = quartoService.getAll();
         return ResponseEntity.ok().body(quarto);
+    }
+
+    @GetMapping("/ocupado") ResponseEntity<List<Quarto>> getByOcupado() {
+        List<Quarto> quarto = quartoService.getByOcupado();
+        return ResponseEntity.ok().body(quarto);
+    }
+
+    @GetMapping("/marcado") ResponseEntity<List<Quarto>> getByMarcado() {
+        List<Quarto> quartos = quartoService.getByMarcadoParaLimpeza();
+        return ResponseEntity.ok().body(quartos);
+    }
+
+    @GetMapping("/tipo/{tipo}")
+    public ResponseEntity<List<Quarto>> getByTipo(@PathVariable String tipo) {
+        List<Quarto> quartos = quartoService.findByTipo(tipo);
+        return ResponseEntity.ok().body(quartos);
     }
 }

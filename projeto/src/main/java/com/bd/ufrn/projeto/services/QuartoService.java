@@ -1,6 +1,7 @@
 package com.bd.ufrn.projeto.services;
 
 import com.bd.ufrn.projeto.dtos.QuartoDTO;
+import com.bd.ufrn.projeto.enums.TipoQuarto;
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Quarto;
 import com.bd.ufrn.projeto.repositories.QuartoRepository;
@@ -57,5 +58,17 @@ public class QuartoService implements CrudService<Quarto, QuartoDTO,Integer> {
     @Override
     public List<Quarto> getAll() {
         return quartoRepository.findAll();
+    }
+
+    public List<Quarto> getByOcupado() {
+        return quartoRepository.findByOcupado();
+    }
+
+    public List<Quarto> getByMarcadoParaLimpeza() {
+        return quartoRepository.findByMarcado();
+    }
+
+    public List<Quarto> findByTipo(String tipo) {
+        return quartoRepository.findByTipo(TipoQuarto.valueOf(tipo));
     }
 }

@@ -24,7 +24,7 @@ public class LimpezaService implements CrudService<Limpeza,LimpezaDTO,Integer> {
     @Override
     public void create(LimpezaDTO limpezaDTO) {
         Quarto quarto = quartoService.get(limpezaDTO.numQuarto());
-        if (quarto.isMarcadoParaLimpeza()) {
+        if (quarto.isMarcadoParaLimpeza() && !quarto.isNaoPerturbe()) {
             Limpeza limpeza = Limpeza.builder()
                     .equipeLimpeza(equipeLimpezaService.get(limpezaDTO.idEquipe()))
                     .data(LocalDateTime.now())
@@ -32,7 +32,7 @@ public class LimpezaService implements CrudService<Limpeza,LimpezaDTO,Integer> {
                     .build();
             limpezaRepository.save(limpeza);
         } else {
-            throw new RuntimeException("Quarto nao marcado pra limpeza!");
+            throw new RuntimeException("Quarto nao marcado pra limpeza ou nao perturbe ativo!");
         }
     }
 
