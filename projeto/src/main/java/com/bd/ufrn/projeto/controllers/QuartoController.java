@@ -18,31 +18,36 @@ public class QuartoController implements GenericController<Quarto,QuartoDTO,Inte
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<Quarto> get(Integer id) {
-        return null;
+    public ResponseEntity<Quarto> get(@PathVariable Integer id) {
+        Quarto quarto = quartoService.get(id);
+        return ResponseEntity.ok().body(quarto);
     }
 
     @PostMapping
     @Override
-    public ResponseEntity<String> create(QuartoDTO quartoDTO) {
-        return null;
+    public ResponseEntity<String> create(@RequestBody QuartoDTO quartoDTO) {
+        quartoService.create(quartoDTO);
+        return ResponseEntity.ok().body("Criado com sucesso.");
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(Integer id, QuartoDTO quartoDTO) {
-        return null;
+    public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody QuartoDTO quartoDTO) {
+        quartoService.update(id, quartoDTO);
+        return ResponseEntity.ok().body("Atualizado com sucesso.");
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(Integer id) {
-        return null;
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
+        quartoService.delete(id);
+        return  ResponseEntity.ok().body("Deletado com sucesso.");
     }
 
     @Override
     @GetMapping("/all")
     public ResponseEntity<List<Quarto>> getAll() {
-        return null;
+        List<Quarto> quarto = quartoService.getAll();
+        return ResponseEntity.ok().body(quarto);
     }
 }

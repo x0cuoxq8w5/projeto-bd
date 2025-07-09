@@ -17,31 +17,36 @@ public class EquipeLimpezaController implements GenericController<EquipeLimpeza,
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<EquipeLimpeza> get(Integer id) {
-        return null;
+    public ResponseEntity<EquipeLimpeza> get(@PathVariable Integer id) {
+        EquipeLimpeza equipeLimpeza = equipeLimpezaService.get(id);
+        return ResponseEntity.ok().body(equipeLimpeza);
     }
 
     @PostMapping
     @Override
-    public ResponseEntity<String> create(EquipeLimpezaDTO equipeLimpezaDTO) {
-        return null;
+    public ResponseEntity<String> create(@RequestBody EquipeLimpezaDTO equipeLimpezaDTO) {
+        equipeLimpezaService.create(equipeLimpezaDTO);
+        return ResponseEntity.ok().body("Criado com sucesso.");
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(Integer id, EquipeLimpezaDTO equipeLimpezaDTO) {
-        return null;
+    public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody EquipeLimpezaDTO equipeLimpezaDTO) {
+        equipeLimpezaService.update(id, equipeLimpezaDTO);
+        return ResponseEntity.ok().body("Atualizado com sucesso.");
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(Integer id) {
-        return null;
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
+        equipeLimpezaService.delete(id);
+        return  ResponseEntity.ok().body("Deletado com sucesso.");
     }
 
     @Override
     @GetMapping("/all")
     public ResponseEntity<List<EquipeLimpeza>> getAll() {
-        return null;
+        List<EquipeLimpeza> equipeLimpeza = equipeLimpezaService.getAll();
+        return ResponseEntity.ok().body(equipeLimpeza);
     }
 }

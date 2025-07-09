@@ -18,31 +18,36 @@ public class HospedeController implements GenericController<Hospede, HospedeDTO,
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<Hospede> get(String id) {
-        return null;
+    public ResponseEntity<Hospede> get(@PathVariable String id) {
+        Hospede hospede = hospedeService.get(id);
+        return ResponseEntity.ok().body(hospede);
     }
 
     @PostMapping
     @Override
-    public ResponseEntity<String> create(HospedeDTO hospedeDTO) {
-        return null;
+    public ResponseEntity<String> create(@RequestBody HospedeDTO hospedeDTO) {
+        hospedeService.create(hospedeDTO);
+        return ResponseEntity.ok().body("Criado com sucesso.");
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(String id, HospedeDTO hospedeDTO) {
-        return null;
+    public ResponseEntity<String> update(@PathVariable String id, @RequestBody HospedeDTO hospedeDTO) {
+        hospedeService.update(id, hospedeDTO);
+        return ResponseEntity.ok().body("Atualizado com sucesso.");
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(String id) {
-        return null;
+    public ResponseEntity<String> delete(@PathVariable String id) {
+        hospedeService.delete(id);
+        return  ResponseEntity.ok().body("Deletado com sucesso.");
     }
 
     @Override
     @GetMapping("/all")
     public ResponseEntity<List<Hospede>> getAll() {
-        return null;
+        List<Hospede> hospede = hospedeService.getAll();
+        return ResponseEntity.ok().body(hospede);
     }
 }

@@ -17,31 +17,36 @@ public class ProdutoController implements GenericController<Produto, ProdutoDTO,
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<Produto> get(Integer id) {
-        return null;
+    public ResponseEntity<Produto> get(@PathVariable Integer id) {
+        Produto produto = produtoService.get(id);
+        return ResponseEntity.ok().body(produto);
     }
 
     @PostMapping
     @Override
-    public ResponseEntity<String> create(ProdutoDTO produtoDTO) {
-        return null;
+    public ResponseEntity<String> create(@RequestBody ProdutoDTO produtoDTO) {
+        produtoService.create(produtoDTO);
+        return ResponseEntity.ok().body("Criado com sucesso.");
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(Integer id, ProdutoDTO produtoDTO) {
-        return null;
+    public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody ProdutoDTO produtoDTO) {
+        produtoService.update(id, produtoDTO);
+        return ResponseEntity.ok().body("Atualizado com sucesso.");
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(Integer id) {
-        return null;
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
+        produtoService.delete(id);
+        return  ResponseEntity.ok().body("Deletado com sucesso.");
     }
 
     @Override
     @GetMapping("/all")
     public ResponseEntity<List<Produto>> getAll() {
-        return null;
+        List<Produto> produto = produtoService.getAll();
+        return ResponseEntity.ok().body(produto);
     }
 }

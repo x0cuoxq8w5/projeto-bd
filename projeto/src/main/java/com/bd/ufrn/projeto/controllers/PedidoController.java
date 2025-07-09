@@ -17,31 +17,36 @@ public class PedidoController implements GenericController<Pedido, PedidoDTO, In
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<Pedido> get(Integer id) {
-        return null;
+    public ResponseEntity<Pedido> get(@PathVariable Integer id) {
+        Pedido pedido = pedidoService.get(id);
+        return ResponseEntity.ok().body(pedido);
     }
 
     @PostMapping
     @Override
-    public ResponseEntity<String> create(PedidoDTO pedidoDTO) {
-        return null;
+    public ResponseEntity<String> create(@RequestBody PedidoDTO pedidoDTO) {
+        pedidoService.create(pedidoDTO);
+        return ResponseEntity.ok().body("Criado com sucesso.");
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(Integer id, PedidoDTO pedidoDTO) {
-        return null;
+    public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody PedidoDTO pedidoDTO) {
+        pedidoService.update(id, pedidoDTO);
+        return ResponseEntity.ok().body("Atualizado com sucesso.");
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(Integer id) {
-        return null;
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
+        pedidoService.delete(id);
+        return  ResponseEntity.ok().body("Deletado com sucesso.");
     }
 
     @Override
     @GetMapping("/all")
     public ResponseEntity<List<Pedido>> getAll() {
-        return null;
+        List<Pedido> pedido = pedidoService.getAll();
+        return ResponseEntity.ok().body(pedido);
     }
 }

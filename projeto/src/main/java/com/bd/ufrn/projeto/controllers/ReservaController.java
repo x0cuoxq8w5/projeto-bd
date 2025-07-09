@@ -18,31 +18,36 @@ public class ReservaController implements GenericController<Reserva,ReservaDTO,I
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<Reserva> get(Integer id) {
-        return null;
+    public ResponseEntity<Reserva> get(@PathVariable Integer id) {
+        Reserva reserva = reservaService.get(id);
+        return ResponseEntity.ok().body(reserva);
     }
 
     @PostMapping
     @Override
-    public ResponseEntity<String> create(ReservaDTO reservaDTO) {
-        return null;
+    public ResponseEntity<String> create(@RequestBody ReservaDTO reservaDTO) {
+        reservaService.create(reservaDTO);
+        return ResponseEntity.ok().body("Criado com sucesso.");
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(Integer id, ReservaDTO reservaDTO) {
-        return null;
+    public ResponseEntity<String> update(@PathVariable Integer id, @RequestBody ReservaDTO reservaDTO) {
+        reservaService.update(id, reservaDTO);
+        return ResponseEntity.ok().body("Atualizado com sucesso.");
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(Integer id) {
-        return null;
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
+        reservaService.delete(id);
+        return  ResponseEntity.ok().body("Deletado com sucesso.");
     }
 
     @Override
     @GetMapping("/all")
     public ResponseEntity<List<Reserva>> getAll() {
-        return null;
+        List<Reserva> reserva = reservaService.getAll();
+        return ResponseEntity.ok().body(reserva);
     }
 }

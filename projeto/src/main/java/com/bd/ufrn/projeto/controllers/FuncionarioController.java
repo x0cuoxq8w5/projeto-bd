@@ -18,31 +18,36 @@ public class FuncionarioController implements GenericController<Funcionario, Fun
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<Funcionario> get(String id) {
-        return null;
+    public ResponseEntity<Funcionario> get(@PathVariable String id) {
+        Funcionario funcionario = funcionarioService.get(id);
+        return ResponseEntity.ok().body(funcionario);
     }
 
     @PostMapping
     @Override
-    public ResponseEntity<String> create(FuncionarioDTO funcionarioDTO) {
-        return null;
+    public ResponseEntity<String> create(@RequestBody FuncionarioDTO funcionarioDTO) {
+        funcionarioService.create(funcionarioDTO);
+        return ResponseEntity.ok().body("Criado com sucesso.");
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(String id, FuncionarioDTO funcionarioDTO) {
-        return null;
+    public ResponseEntity<String> update(@PathVariable String id, @RequestBody FuncionarioDTO funcionarioDTO) {
+        funcionarioService.update(id, funcionarioDTO);
+        return ResponseEntity.ok().body("Atualizado com sucesso.");
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(String id) {
-        return null;
+    public ResponseEntity<String> delete(@PathVariable String id) {
+        funcionarioService.delete(id);
+        return  ResponseEntity.ok().body("Deletado com sucesso.");
     }
 
     @Override
     @GetMapping("/all")
     public ResponseEntity<List<Funcionario>> getAll() {
-        return null;
+        List<Funcionario> funcionario = funcionarioService.getAll();
+        return ResponseEntity.ok().body(funcionario);
     }
 }
