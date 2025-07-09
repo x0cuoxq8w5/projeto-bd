@@ -118,4 +118,10 @@ public class ProdutoRepository extends AbstractRepository<Produto> implements St
         }
         return produtos;
     }
+
+    //Que nem findbyid so que para uma lista de IDS
+    public List<Produto> findByIds(List<Integer> ids) {
+        List<Produto> produtos = new ArrayList<>();
+        return produtos;
+    }
 }

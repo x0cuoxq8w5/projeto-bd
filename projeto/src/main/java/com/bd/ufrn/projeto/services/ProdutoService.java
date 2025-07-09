@@ -50,4 +50,8 @@ public class ProdutoService implements CrudService<Produto, ProdutoDTO,Integer> 
     public List<Produto> getAll() {
         return produtoRepository.findAll();
     }
+
+    public List<Produto> getByIds(List<Integer> ids) {
+        return produtoRepository.findByIds(ids);
+    }
 }

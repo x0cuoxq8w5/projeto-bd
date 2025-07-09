@@ -92,4 +92,10 @@ public class HospedeRepository extends AbstractRepository<Hospede> implements St
         }
         return hospedes;
     }
+
+    // SELECT * FROM hospedes WHERE desativado = <desativado>
+    public List<Hospede> findByDesativado(boolean desativado) {
+        List<Hospede> hospedes = new ArrayList<>();
+        return hospedes;
+    }
 }
