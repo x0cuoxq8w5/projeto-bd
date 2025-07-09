@@ -48,6 +48,6 @@ public class ProdutoService implements CrudService<Produto, ProdutoDTO,Integer> 
 
     @Override
     public List<Produto> getAll() {
-        return List.of();
+        return produtoRepository.findAll();
     }
 }

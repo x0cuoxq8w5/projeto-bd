@@ -49,4 +49,16 @@ public class EquipeLimpezaController implements GenericController<EquipeLimpeza,
         List<EquipeLimpeza> equipeLimpeza = equipeLimpezaService.getAll();
         return ResponseEntity.ok().body(equipeLimpeza);
     }
+
+    @PostMapping("/{id}/funcionario/{idFuncionario}")
+    public ResponseEntity<String> addFuncionario(@PathVariable Integer id, @PathVariable String idFuncionario) {
+        equipeLimpezaService.addToEquipe(id,idFuncionario);
+        return ResponseEntity.ok().body("Adicionado com sucesso.");
+    }
+
+    @DeleteMapping("/{id}/funcionario/{idFuncionario}")
+    public ResponseEntity<String> removeFuncionario(@PathVariable Integer id, @PathVariable String idFuncionario) {
+        equipeLimpezaService.removeFromEquipe(id,idFuncionario);
+        return ResponseEntity.ok().body("Removido com sucesso.");
+    }
 }

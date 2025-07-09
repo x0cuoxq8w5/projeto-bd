@@ -5,5 +5,6 @@ import java.time.LocalDateTime;
 public record HospedeDTO(
         String cpf,
         LocalDateTime dataNascimento,
-        String nome) {
+        String nome,
+        Boolean desativado) {
 }

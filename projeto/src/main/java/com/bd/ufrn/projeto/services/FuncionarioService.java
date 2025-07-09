@@ -51,6 +51,6 @@ public class FuncionarioService implements CrudService<Funcionario, FuncionarioD
 
     @Override
     public List<Funcionario> getAll() {
-        return List.of();
+        return funcionarioRepository.findAll();
     }
 }

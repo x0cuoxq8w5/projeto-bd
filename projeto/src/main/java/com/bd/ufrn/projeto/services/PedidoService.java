@@ -47,6 +47,6 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
 
     @Override
     public List<Pedido> getAll() {
-        return List.of();
+        return pedidoRepository.findAll();
     }
 }

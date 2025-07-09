@@ -24,6 +24,7 @@ public class HospedeService implements CrudService<Hospede,HospedeDTO,String> {
                 .cpf(hospedeDTO.cpf())
                 .dataNascimento(hospedeDTO.dataNascimento())
                 .nome(hospedeDTO.nome())
+                .desativado(false)
                 .build();
         hospedeRepository.save(hospede);
     }
@@ -32,6 +33,7 @@ public class HospedeService implements CrudService<Hospede,HospedeDTO,String> {
     public void update(String id, HospedeDTO hospedeDTO) {
         Hospede hospede = get(id);
         if(hospedeDTO.nome() != null) hospede.setNome(hospedeDTO.nome());
+        if(hospedeDTO.desativado() != null) hospede.setDesativado(hospedeDTO.desativado());
         hospedeRepository.save(hospede);
     }
 
@@ -43,6 +45,6 @@ public class HospedeService implements CrudService<Hospede,HospedeDTO,String> {
 
     @Override
     public List<Hospede> getAll() {
-        return List.of();
+        return hospedeRepository.findAll();
     }
 }
