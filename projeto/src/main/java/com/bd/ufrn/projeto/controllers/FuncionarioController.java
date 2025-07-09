@@ -1,6 +1,7 @@
 package com.bd.ufrn.projeto.controllers;
 
 import com.bd.ufrn.projeto.dtos.FuncionarioDTO;
+import com.bd.ufrn.projeto.enums.Papel;
 import com.bd.ufrn.projeto.interfaces.GenericController;
 import com.bd.ufrn.projeto.models.Funcionario;
 import com.bd.ufrn.projeto.services.FuncionarioService;
@@ -49,5 +50,11 @@ public class FuncionarioController implements GenericController<Funcionario, Fun
     public ResponseEntity<List<Funcionario>> getAll() {
         List<Funcionario> funcionario = funcionarioService.getAll();
         return ResponseEntity.ok().body(funcionario);
+    }
+
+    @GetMapping("/papel/{papel}")
+    public ResponseEntity<List<Funcionario>> getByPapel(@PathVariable String papel) {
+        List<Funcionario> funcionarios = funcionarioService.getByPapel(Papel.valueOf(papel));
+        return ResponseEntity.ok().body(funcionarios);
     }
 }

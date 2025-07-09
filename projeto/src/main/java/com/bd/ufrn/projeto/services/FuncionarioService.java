@@ -1,6 +1,7 @@
 package com.bd.ufrn.projeto.services;
 
 import com.bd.ufrn.projeto.dtos.FuncionarioDTO;
+import com.bd.ufrn.projeto.enums.Papel;
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Funcionario;
 import com.bd.ufrn.projeto.repositories.FuncionarioRepository;
@@ -52,5 +53,9 @@ public class FuncionarioService implements CrudService<Funcionario, FuncionarioD
     @Override
     public List<Funcionario> getAll() {
         return funcionarioRepository.findAll();
+    }
+
+    public List<Funcionario> getByPapel(Papel papel) {
+        return funcionarioRepository.findByPapel(papel);
     }
 }
