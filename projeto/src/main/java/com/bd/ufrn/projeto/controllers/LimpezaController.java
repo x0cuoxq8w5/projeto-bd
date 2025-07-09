@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
+@RequestMapping("limpeza")
 public class LimpezaController implements GenericController<Limpeza,LimpezaDTO,Integer> {
     @Autowired LimpezaService limpezaService;
 
