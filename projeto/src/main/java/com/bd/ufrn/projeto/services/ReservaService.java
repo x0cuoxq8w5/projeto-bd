@@ -1,15 +1,21 @@
 package com.bd.ufrn.projeto.services;
 
 import com.bd.ufrn.projeto.dtos.ReservaDTO;
-import com.bd.ufrn.projeto.dtos.ReservaFormReq;
+
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Reserva;
 import com.bd.ufrn.projeto.repositories.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bd.ufrn.projeto.dtos.QuartoReservaRes;
+import com.bd.ufrn.projeto.models.Quarto;
+
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> {
@@ -54,6 +60,21 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
 
     public List<Reserva> getByCpf(String cpf) {
         return reservaRepository.findByCpf(cpf);
+    }
+
+    public List<QuartoReservaRes> findQuartosDisponiveis(Date dataInicio, Date dataFim) {
+        LocalDateTime dataInicioDateTime = dataInicio.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime dataFimDateTime = dataFim.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        List<Integer> quartosOcupadosIds = reservaRepository.findQuartosOcupados(dataInicioDateTime, dataFimDateTime);
+
+        List<Quarto> quartosDisponiveis = quartoService.getAll().stream()
+                .filter(quarto -> !quartosOcupadosIds.contains(quarto.getNumero()))
+                .toList();
+
+        return quartosDisponiveis.stream()
+                .map(quarto -> new QuartoReservaRes((long) quarto.getNumero(), String.valueOf(quarto.getNumero()), quarto.getTipo(), false, false))
+                .collect(Collectors.toList());
     }
 
 //    public ReservaDTO formReqToDTO(ReservaFormReq reservaFormReq) {

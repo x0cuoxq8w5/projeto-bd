@@ -1,10 +1,9 @@
 package com.bd.ufrn.projeto.controllers;
 
-
 import com.bd.ufrn.projeto.dtos.BreadcrumbItem;
 import com.bd.ufrn.projeto.dtos.QuartoReservaRes;
 import com.bd.ufrn.projeto.dtos.ReservaFormReq;
-import com.bd.ufrn.projeto.enums.TipoQuarto;
+import com.bd.ufrn.projeto.services.QuartoService;
 import com.bd.ufrn.projeto.services.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +27,12 @@ import java.util.List;
 public class RecepcaoPageController {
 
     private final ReservaService reservaService;
+    private final QuartoService quartoService;
 
     @Autowired
-    public RecepcaoPageController(ReservaService reservaService) {
+    public RecepcaoPageController(ReservaService reservaService, QuartoService quartoService) {
         this.reservaService = reservaService;
+        this.quartoService = quartoService;
     }
 
 
@@ -42,33 +49,20 @@ public class RecepcaoPageController {
         model.addAttribute("pageDescription", "Preencha os dados para criar uma nova reserva");
         model.addAttribute("reserva", new ReservaFormReq());
 
-        // Temporary
-        List<QuartoReservaRes> quartos = List.of(
-                new QuartoReservaRes(1L, "1", TipoQuarto.SIMPLES, true, false),
-                new QuartoReservaRes(2L, "2", TipoQuarto.SIMPLES, false, true),
-                new QuartoReservaRes(3L, "3", TipoQuarto.SIMPLES, true, false),
-                new QuartoReservaRes(4L, "4", TipoQuarto.SUITE, false, true),
-                new QuartoReservaRes(5L, "5", TipoQuarto.SIMPLES, true, true),
-                new QuartoReservaRes(6L, "6", TipoQuarto.SUITE, false, false),
-                new QuartoReservaRes(7L, "7", TipoQuarto.SIMPLES, false, false),
-                new QuartoReservaRes(8L, "8", TipoQuarto.SIMPLES, false, false),
-                new QuartoReservaRes(9L, "9", TipoQuarto.SIMPLES, true, true),
-                new QuartoReservaRes(10L, "10", TipoQuarto.COBERTURA, false, true),
-                new QuartoReservaRes(11L, "11", TipoQuarto.COBERTURA, true, true),
-                new QuartoReservaRes(12L, "12", TipoQuarto.COBERTURA, false, true),
-                new QuartoReservaRes(13L, "13", TipoQuarto.COBERTURA, true, true),
-                new QuartoReservaRes(14L, "14", TipoQuarto.COBERTURA, false, true),
-                new QuartoReservaRes(15L, "15", TipoQuarto.COBERTURA, true, true),
-                new QuartoReservaRes(16L, "16", TipoQuarto.COBERTURA, false, true),
-                new QuartoReservaRes(17L, "17", TipoQuarto.COBERTURA, true, true),
-                new QuartoReservaRes(18L, "18", TipoQuarto.COBERTURA, false, true),
-                new QuartoReservaRes(19L, "19", TipoQuarto.COBERTURA, true, true),
-                new QuartoReservaRes(20L, "20", TipoQuarto.COBERTURA, false, true),
-                new QuartoReservaRes(21L, "21", TipoQuarto.COBERTURA, true, true)
-        );
-        model.addAttribute("quartos", quartos);
+        model.addAttribute("quartos", new ArrayList<QuartoReservaRes>());
 
         return "reservas/nova-reserva";
+    }
+
+
+    @GetMapping("/reservas/quartos-disponiveis")
+    @ResponseBody
+    public List<QuartoReservaRes> getQuartosDisponiveis(@RequestParam("dataInicio") String dataInicio, @RequestParam("dataFim") String dataFim) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date dataInicioDate = formatter.parse(dataInicio);
+        Date dataFimDate = formatter.parse(dataFim);
+
+        return reservaService.findQuartosDisponiveis(dataInicioDate, dataFimDate);
     }
 
 
@@ -85,5 +79,18 @@ public class RecepcaoPageController {
     public String listarReservas(Model model) {
 
         return "reservas/lista-reservas";
+    }
+
+    @GetMapping("/quartos")
+    public String listarQuartos(Model model) {
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Quartos", null, true));
+
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Status dos Quartos");
+        model.addAttribute("pageDescription", "Visualize o status de todos os quartos do hotel");
+        model.addAttribute("quartos", quartoService.getAll());
+
+        return "quartos/lista-quartos";
     }
 }

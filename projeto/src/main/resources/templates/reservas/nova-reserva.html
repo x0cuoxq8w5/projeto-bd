@@ -252,32 +252,7 @@
                   </div>
 
                   <div class="mt-4 pt-3">
-                    <div class="flex flex-wrap gap-4 text-sm">
-                      <div class="flex items-center gap-2">
-                        <div
-                          class="w-4 h-4 bg-base-100 border-2 border-base-300 rounded-full"
-                        ></div>
-                        <span class="text-base-content/70">Disponível</span>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <div
-                          class="w-4 h-4 bg-base-300 border-2 border-base-300 rounded-full relative"
-                        >
-                          <div
-                            class="absolute inset-0 bg-red-500/20 rounded"
-                          ></div>
-                        </div>
-                        <span class="text-base-content/70">Ocupado</span>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <div
-                          class="w-4 h-4 bg-yellow-300/30 border-2 border-base-300 rounded-full"
-                        ></div>
-                        <span class="text-base-content/70">Limpeza</span>
-                      </div>
-                    </div>
                   </div>
-                </div>
 
                 <!-- Quarto selecionado -->
                 <div
@@ -308,7 +283,7 @@
           </div>
 
           <!-- Botões de Ação -->
-          <div class="flex gap-4 justify-end">
+          <div class="flex gap-4 justify-end mb-6 mr-8">
             <a href="/reservas" class="btn btn-outline btn-lg">
               <svg
                 class="w-5 h-5 mr-2"
@@ -373,13 +348,17 @@
           dataInicio.min = hoje;
           dataFinal.min = hoje;
 
-          function formatarData(data) {
+          function formatarData(dataString) {
+            // Corrige o problema de fuso horário ao fazer o parse da data YYYY-MM-DD
+            const [ano, mes, dia] = dataString.split('-').map(Number);
+            const data = new Date(ano, mes - 1, dia);
+
             const options = {
-              day: '2-digit',
-              month: '2-digit',
+              day: 'numeric',
+              month: 'long',
               year: 'numeric',
             };
-            return new Date(data).toLocaleDateString('pt-BR', options);
+            return data.toLocaleDateString('pt-BR', options);
           }
 
           function calcularDiferenca(inicio, fim) {

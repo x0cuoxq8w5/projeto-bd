@@ -52,6 +52,34 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
         return null;
     }
 
+    public List<Integer> findQuartosOcupados(LocalDateTime dataInicio, LocalDateTime dataFim) {
+        String sql = """
+            SELECT DISTINCT r.numero
+            FROM reserva r
+            WHERE r.data_inicio < ? AND r.data_fim > ?
+        """;
+
+        List<Integer> quartosOcupadosIds = new ArrayList<>();
+
+        try (Connection conn = connectionFactory.connection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setTimestamp(1, Timestamp.valueOf(dataFim));
+            stmt.setTimestamp(2, Timestamp.valueOf(dataInicio));
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    quartosOcupadosIds.add(rs.getInt("numero"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return quartosOcupadosIds;
+    }
+
     public List<Reserva> findByCpf(String cpf) {
         String sql = """
             SELECT r.*, h.nome_sobrenome, h.data_nasc,

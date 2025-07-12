@@ -1,10 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html
+  lang="pt-BR"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/layout}"
+>
+  <head>
+    <title>Status dos Quartos</title>
+  </head>
+  <body>
+    <!-- Page Content -->
+    <div layout:fragment="content">
+      <!-- Card Principal -->
+      <div
+        class="card bg-base-100/80 backdrop-blur-sm shadow-xl border border-base-300/50"
+      >
+        <div class="card-body">
+          <!-- Grid de Quartos -->
+          <div
+            id="quartos-grid"
+            class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-4"
+          >
+            <!-- Quartos serão inseridos aqui pelo Thymeleaf -->
+            <div
+              th:each="quarto : ${quartos}"
+              class="quarto-item relative w-16 h-16 border-2 rounded-lg flex items-center justify-center font-bold text-sm transition-all duration-200"
+              th:attr="data-status=${quarto.marcadoParaLimpeza ? 'LIMPEZA' : (quarto.ocupado ? 'OCUPADO' : 'DISPONIVEL')}"
+            >
+              <span
+                class="relative z-10 text-base-content"
+                th:text="${quarto.numero}"
+              ></span>
+            </div>
+          </div>
 
-</body>
+          <!-- Legenda -->
+          <div class="mt-8 pt-6 border-t border-base-300/50">
+            <h3 class="text-lg font-medium mb-4">Legenda</h3>
+            <div class="flex flex-wrap gap-x-6 gap-y-3 text-sm">
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-4 h-4 rounded-full bg-success/20 border-2 border-success"
+                ></div>
+                <span class="text-base-content/80">Disponível</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-4 h-4 rounded-full bg-error/20 border-2 border-error"
+                ></div>
+                <span class="text-base-content/80">Ocupado</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-4 h-4 rounded-full bg-warning/20 border-2 border-warning"
+                ></div>
+                <span class="text-base-content/80">Limpeza</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+      <script th:src="@{/js/quartos.js}"></script>
+    </th:block>
+  </body>
 </html>
