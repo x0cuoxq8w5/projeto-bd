@@ -5,6 +5,8 @@ import com.bd.ufrn.projeto.dtos.BreadcrumbItem;
 import com.bd.ufrn.projeto.dtos.QuartoReservaRes;
 import com.bd.ufrn.projeto.dtos.ReservaFormReq;
 import com.bd.ufrn.projeto.enums.TipoQuarto;
+import com.bd.ufrn.projeto.services.ReservaService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,14 @@ import java.util.List;
 @Controller
 @RequestMapping("recepcao")
 public class RecepcaoPageController {
+
+    private final ReservaService reservaService;
+
+    @Autowired
+    public RecepcaoPageController(ReservaService reservaService) {
+        this.reservaService = reservaService;
+    }
+
 
     @GetMapping("/reservas/nova")
     public String novaReserva(Model model) {
@@ -65,6 +75,8 @@ public class RecepcaoPageController {
     @PostMapping("/reservas/nova")
     public String processarNovaReserva(@ModelAttribute("reserva") ReservaFormReq reserva) {
         System.out.println(reserva);
+
+
 
         return "redirect:/recepcao/reservas";
     }

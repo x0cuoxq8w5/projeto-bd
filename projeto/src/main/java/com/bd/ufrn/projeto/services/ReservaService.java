@@ -1,6 +1,7 @@
 package com.bd.ufrn.projeto.services;
 
 import com.bd.ufrn.projeto.dtos.ReservaDTO;
+import com.bd.ufrn.projeto.dtos.ReservaFormReq;
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Reserva;
 import com.bd.ufrn.projeto.repositories.ReservaRepository;
@@ -54,4 +55,19 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
     public List<Reserva> getByCpf(String cpf) {
         return reservaRepository.findByCpf(cpf);
     }
+
+//    public ReservaDTO formReqToDTO(ReservaFormReq reservaFormReq) {
+//        ReservaDTO reservaDTO = new ReservaDTO(
+//                null,
+//                reservaFormReq.getCpf(),
+//                LocalDateTime.now(),
+//                reservaFormReq.getDataFinal(),
+//                LocalDateTime.now(),
+//                reservaFormReq.getQuartoId(),
+//                reservaFormReq.getNome(),
+//                reservaFormReq.getTipoQuarto()
+//        );
+//
+//        return reservaDTO;
+//    }
 }
