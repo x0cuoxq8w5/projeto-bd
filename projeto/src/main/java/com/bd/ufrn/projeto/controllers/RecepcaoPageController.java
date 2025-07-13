@@ -84,9 +84,19 @@ public class RecepcaoPageController {
 
 
     @PostMapping("/reservas/registrar-entrada")
-    public String registrarEntrada(@RequestParam("reservaId") Integer reservaId) {
-        reservaService.registrarEntrada(reservaId);
-        return "redirect:/recepcao/reservas";
+    public String registrarEntrada(@RequestParam("reservaId") Integer reservaId, Model model) {
+        try {
+            reservaService.registrarEntrada(reservaId);
+            return "redirect:/recepcao/reservas";
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("pageTitle", "Registrar Entrada de Hóspede");
+            List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+            breadcrumbs.add(new BreadcrumbItem("Recepção", "/recepcao", false));
+            breadcrumbs.add(new BreadcrumbItem("Registrar Entrada", null, true));
+            model.addAttribute("breadcrumbs", breadcrumbs);
+            return "reservas/registrar-entrada";
+        }
     }
 
 

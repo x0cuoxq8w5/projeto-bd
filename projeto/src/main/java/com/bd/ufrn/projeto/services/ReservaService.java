@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -92,12 +91,16 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
         if (reserva == null) {
             throw new IllegalArgumentException("Reserva não encontrada");
         }
-
         if (reserva.getDataEntrada() != null) {
             throw new IllegalStateException("Check-in já foi realizado para esta reserva.");
         }
 
-        reserva.setDataEntrada(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(reserva.getDataInicio()) || now.isAfter(reserva.getDataFim())) {
+            throw new IllegalStateException("Check-in só pode ser realizado entre a data de início e fim da reserva.");
+        }
+
+        reserva.setDataEntrada(now);
         reservaRepository.save(reserva);
     }
 
