@@ -104,6 +104,22 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
         reservaRepository.save(reserva);
     }
 
+    public void registrarSaida(Integer reservaId) {
+        Reserva reserva = reservaRepository.findById(reservaId);
+        if (reserva == null) {
+            throw new IllegalArgumentException("Reserva não encontrada");
+        }
+        if (reserva.getDataEntrada() == null) {
+            throw new IllegalStateException("Check-in ainda não foi realizado para esta reserva.");
+        }
+        if (reserva.getDataSaida() != null) {
+            throw new IllegalStateException("Check-out já foi realizado para esta reserva.");
+        }
+
+        reserva.setDataSaida(LocalDateTime.now());
+        reservaRepository.save(reserva);
+    }
+
     public List<Reserva> getByCpf(String cpf) {
         return reservaRepository.findByCpf(cpf);
     }

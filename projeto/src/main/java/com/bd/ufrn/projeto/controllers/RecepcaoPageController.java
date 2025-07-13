@@ -92,14 +92,39 @@ public class RecepcaoPageController {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("pageTitle", "Registrar Entrada de Hóspede");
             List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
-            breadcrumbs.add(new BreadcrumbItem("Recepção", "/recepcao", false));
+            breadcrumbs.add(new BreadcrumbItem("Reservas", "/recepcao/reservas", false));
             breadcrumbs.add(new BreadcrumbItem("Registrar Entrada", null, true));
             model.addAttribute("breadcrumbs", breadcrumbs);
             return "reservas/registrar-entrada";
         }
     }
 
+    @GetMapping("/reservas/registrar-saida")
+    public String showRegistrarSaidaForm(Model model) {
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Reservas", "/recepcao/reservas", false));
+        breadcrumbs.add(new BreadcrumbItem("Registrar Saída", null, true));
 
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Registrar Saída de Hóspede");
+        return "reservas/registrar-saida";
+    }
+
+    @PostMapping("/reservas/registrar-saida")
+    public String registrarSaida(@RequestParam("reservaId") Integer reservaId, Model model) {
+        try {
+            reservaService.registrarSaida(reservaId);
+            return "redirect:/recepcao/reservas";
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("pageTitle", "Registrar Saída de Hóspede");
+            List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+            breadcrumbs.add(new BreadcrumbItem("Recepção", "/recepcao", false));
+            breadcrumbs.add(new BreadcrumbItem("Registrar Saída", null, true));
+            model.addAttribute("breadcrumbs", breadcrumbs);
+            return "reservas/registrar-saida";
+        }
+    }
 
     @GetMapping("/reservas")
     public String listarReservas(Model model) {
