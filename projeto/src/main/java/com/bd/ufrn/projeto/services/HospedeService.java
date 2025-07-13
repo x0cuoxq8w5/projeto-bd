@@ -52,4 +52,12 @@ public class HospedeService implements CrudService<Hospede,HospedeDTO,String> {
     public List<HospedeListDto> getAllAsDto() {
         return hospedeRepository.findAll().stream().map(HospedeListDto::new).collect(java.util.stream.Collectors.toList());
     }
+
+    public void toggleDesativado(String cpf) {
+        Hospede hospede = get(cpf);
+        if (hospede != null) {
+            hospede.setDesativado(!hospede.isDesativado());
+            hospedeRepository.save(hospede);
+        }
+    }
 }

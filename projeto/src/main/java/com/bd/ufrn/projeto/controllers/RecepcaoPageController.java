@@ -115,6 +115,12 @@ public class RecepcaoPageController {
         return "hospedes/lista-hospedes";
     }
 
+    @PostMapping("/hospedes/toggle-status")
+    public String toggleHospedeStatus(@RequestParam("cpf") String cpf) {
+        hospedeService.toggleDesativado(cpf);
+        return "redirect:/recepcao/hospedes";
+    }
+
     @GetMapping("/quartos")
     public String listarQuartos(Model model) {
         List<BreadcrumbItem> breadcrumbs = new ArrayList<>();

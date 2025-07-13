@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const cpfMessage = document.getElementById('cpf-message');
   const nomeInput = document.getElementById('nome');
   const dataNascimentoInput = document.getElementById('dataNascimento');
+  const submitButton = document.querySelector('button[type="submit"]');
+
+
 
   let quartoAtualSelecionado = null;
   let todosOsQuartosDisponiveis = [];
@@ -124,23 +127,39 @@ document.addEventListener('DOMContentLoaded', function () {
       const response = await fetch(`/recepcao/hospedes/${cpf}`);
       if (response.ok) {
         const hospede = await response.json();
-        nomeInput.value = hospede.nome;
-        // Formata a data para YYYY-MM-DD
-        dataNascimentoInput.value = hospede.dataNascimento.substring(0, 10);
-        nomeInput.readOnly = true;
-        dataNascimentoInput.readOnly = true;
-        cpfMessage.textContent = 'Hóspede encontrado.';
-        cpfMessage.className = 'label-text-alt text-success';
+
+        if (hospede.desativado) {
+          // Hóspede encontrado, mas desativado
+          nomeInput.value = hospede.nome;
+          dataNascimentoInput.value = hospede.dataNascimento.substring(0, 10);
+          nomeInput.readOnly = true;
+          dataNascimentoInput.readOnly = true;
+          cpfMessage.textContent = 'Hóspede desativado. Não é possível criar uma reserva.';
+          cpfMessage.className = 'label-text-alt text-error';
+          submitButton.disabled = true;
+        } else {
+          // Hóspede encontrado e ativo
+          nomeInput.value = hospede.nome;
+          dataNascimentoInput.value = hospede.dataNascimento.substring(0, 10);
+          nomeInput.readOnly = true;
+          dataNascimentoInput.readOnly = true;
+          cpfMessage.textContent = 'Hóspede encontrado.';
+          cpfMessage.className = 'label-text-alt text-success';
+          submitButton.disabled = false;
+        }
       } else {
+        // Hóspede não encontrado
         resetHospedeFields(true);
         cpfMessage.textContent = 'Novo hóspede. Preencha os dados.';
         cpfMessage.className = 'label-text-alt text-info';
+        submitButton.disabled = false;
       }
     } catch (error) {
       console.error('Erro ao buscar hóspede:', error);
       resetHospedeFields(true);
       cpfMessage.textContent = 'Erro ao buscar CPF. Tente novamente.';
       cpfMessage.className = 'label-text-alt text-error';
+      submitButton.disabled = false;
     }
     finally {
         cpfSpinner.classList.add('hidden');
