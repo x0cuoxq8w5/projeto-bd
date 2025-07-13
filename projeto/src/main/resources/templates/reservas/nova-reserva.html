@@ -41,20 +41,6 @@
                 Dados do Hóspede
               </h2>
 
-              <!-- Nome -->
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium">Nome Completo</span>
-                </label>
-                <input
-                  type="text"
-                  th:field="*{nome}"
-                  placeholder="Digite o nome completo do hóspede"
-                  class="input input-bordered w-full"
-                  required
-                />
-              </div>
-
               <!-- CPF -->
               <div class="form-control">
                 <label class="label">
@@ -69,6 +55,22 @@
                   required
                 />
               </div>
+              
+              <!-- Nome -->
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">Nome Completo</span>
+                </label>
+                <input
+                  type="text"
+                  th:field="*{nome}"
+                  placeholder="Digite o nome completo do hóspede"
+                  class="input input-bordered w-full"
+                  required
+                />
+              </div>
+
+              
 
               <!-- Data de Nascimento -->
               <div class="form-control">
@@ -83,22 +85,7 @@
                 />
               </div>
 
-              <!-- Tipo de Quarto -->
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium">Tipo de Quarto</span>
-                </label>
-                <select
-                  th:field="*{tipoQuarto}"
-                  class="select select-bordered w-full"
-                  id="tipoQuarto"
-                >
-                  <option value="">Selecione o tipo de quarto</option>
-                  <option value="SIMPLES">Quarto Simples</option>
-                  <option value="SUITE">Suíte</option>
-                  <option value="COBERTURA">Cobertura</option>
-                </select>
-              </div>
+
             </div>
           </div>
 
@@ -199,22 +186,35 @@
             class="card bg-base-100/80 backdrop-blur-sm shadow-xl border border-base-300/50"
           >
             <div class="card-body">
-              <h2 class="card-title mb-4 text-2xl">
-                <svg
-                  class="w-6 h-6 text-secondary mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div class="flex justify-between items-center mb-6">
+                <h2 class="card-title text-2xl">
+                  <svg
+                    class="w-6 h-6 text-success mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                    ></path>
+                  </svg>
+                  Seleção de Quarto
+                </h2>
+                <select
+                  th:field="*{tipoQuarto}"
+                  class="select select-bordered"
+                  id="tipoQuarto"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                  ></path>
-                </svg>
-                Seleção de Quarto
-              </h2>
+                  <option value="" disabled selected>Tipo</option>
+                  <option value="">Todos</option>
+                  <option value="SIMPLES">Simples</option>
+                  <option value="SUITE">Suíte</option>
+                  <option value="COBERTURA">Cobertura</option>
+                </select>
+              </div>
 
               <!-- Placeholder inicial -->
               <div

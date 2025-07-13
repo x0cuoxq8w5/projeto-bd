@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let quartoAtualSelecionado = null;
   let todosOsQuartosDisponiveis = []; // Armazena os quartos buscados
 
+
   // Função para buscar e renderizar quartos
   async function fetchAndRenderQuartos() {
     const dataInicio = dataInicioInput.value;
@@ -100,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function getTipoQuartoNome(tipo) {
-    const tipos = { SIMPLES: 'Quarto Simples', SUITE: 'Suíte', COBERTURA: 'Cobertura' };
+    const tipos = { SIMPLES: 'Simples', SUITE: 'Suíte', COBERTURA: 'Cobertura' };
     return tipos[tipo] || tipo;
   }
 
@@ -109,11 +110,13 @@ document.addEventListener('DOMContentLoaded', function () {
   dataFinalInput.addEventListener('change', fetchAndRenderQuartos);
   tipoQuartoSelect.addEventListener('change', () => {
     resetSelecaoQuarto();
+    if(!dataInicioInput.value || !dataFinalInput.value) return;
+    
     filtrarERenderizar(tipoQuartoSelect.value);
   });
 
   // Inicialização
-  fetchAndRenderQuartos(); // Chama na carga inicial
+  fetchAndRenderQuartos();
 });
 
 // CPF máscara

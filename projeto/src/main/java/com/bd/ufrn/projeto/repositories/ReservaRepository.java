@@ -144,7 +144,7 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
 
         String insertSql = """
             INSERT INTO reserva (cpf, data_inicio, data_fim, data_entrada, data_saida, numero)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
         """;
 
         String updateSql = """
