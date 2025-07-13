@@ -91,8 +91,28 @@ public class RecepcaoPageController {
 
     @GetMapping("/reservas")
     public String listarReservas(Model model) {
+        // Create breadcrumb items
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Reservas", null, true));
+
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Lista de Reservas");
+        model.addAttribute("reservas", reservaService.getAllAsDto());
 
         return "reservas/lista-reservas";
+    }
+
+    @GetMapping("/hospedes")
+    public String listarHospedes(Model model) {
+        // Create breadcrumb items
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Hóspedes", null, true));
+
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Lista de Hóspedes");
+        model.addAttribute("hospedes", hospedeService.getAllAsDto());
+
+        return "hospedes/lista-hospedes";
     }
 
     @GetMapping("/quartos")

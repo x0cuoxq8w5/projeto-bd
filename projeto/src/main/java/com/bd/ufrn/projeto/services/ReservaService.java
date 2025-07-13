@@ -1,5 +1,6 @@
 package com.bd.ufrn.projeto.services;
 
+import com.bd.ufrn.projeto.dtos.ReservaListDto;
 import com.bd.ufrn.projeto.dtos.ReservaDTO;
 import com.bd.ufrn.projeto.dtos.ReservaFormReq;
 import com.bd.ufrn.projeto.dtos.HospedeDTO;
@@ -59,6 +60,10 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
     @Override
     public List<Reserva> getAll() {
         return reservaRepository.findAll();
+    }
+
+    public List<ReservaListDto> getAllAsDto() {
+        return reservaRepository.findAll().stream().map(ReservaListDto::new).collect(Collectors.toList());
     }
 
     public List<Reserva> getByCpf(String cpf) {

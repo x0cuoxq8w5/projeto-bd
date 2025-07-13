@@ -1,4 +1,64 @@
 <!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>Lista de Hóspedes</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Lista de Hóspedes</h1>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <table class="min-w-full leading-normal">
+                <thead>
+                <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        CPF
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Nome
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Data de Nascimento
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Desativado
+                    </th>
+                </tr>
+                </thead>
+                <tbody th:if="${!hospedes.isEmpty()}">
+                <tr th:each="hospede : ${hospedes}">
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap" th:text="${hospede.cpf}"></p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap" th:text="${hospede.nome}"></p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap" th:text="${#temporals.format(hospede.dataNascimento, 'dd/MM/yyyy')}"></p>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p class="text-gray-900 whitespace-no-wrap" th:text="${hospede.desativado ? 'Sim' : 'Não'}"></p>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody th:if="${hospedes.isEmpty()}">
+                <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" colspan="4">
+                        <p class="text-gray-900 whitespace-no-wrap text-center">Nenhum hóspede encontrado.</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
