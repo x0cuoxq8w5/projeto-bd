@@ -1,6 +1,9 @@
 package com.bd.ufrn.projeto.services;
 
 import com.bd.ufrn.projeto.dtos.ReservaDTO;
+import com.bd.ufrn.projeto.dtos.ReservaFormReq;
+import com.bd.ufrn.projeto.dtos.HospedeDTO;
+import com.bd.ufrn.projeto.models.Hospede;
 
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Reserva;
@@ -60,6 +63,30 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
 
     public List<Reserva> getByCpf(String cpf) {
         return reservaRepository.findByCpf(cpf);
+    }
+
+    public void processarNovaReserva(ReservaFormReq reservaFormReq) {
+        Hospede hospede = hospedeService.get(reservaFormReq.getCpf());
+
+        if (hospede == null) {
+            HospedeDTO novoHospede = new HospedeDTO(
+                    reservaFormReq.getCpf(),
+                    reservaFormReq.getDataNascimento().atStartOfDay(),
+                    reservaFormReq.getNome(),
+                    false
+            );
+            hospedeService.create(novoHospede);
+            hospede = hospedeService.get(reservaFormReq.getCpf());
+        }
+
+        Reserva reserva = Reserva.builder()
+                .dataInicio(reservaFormReq.getDataInicio().atStartOfDay())
+                .dataFim(reservaFormReq.getDataFinal().atStartOfDay())
+                .hospede(hospede)
+                .quarto(quartoService.get(reservaFormReq.getQuartoId().intValue()))
+                .build();
+
+        reservaRepository.save(reserva);
     }
 
     public List<QuartoReservaRes> findQuartosDisponiveis(Date dataInicio, Date dataFim) {

@@ -1,11 +1,5 @@
 package com.bd.ufrn.projeto.repositories;
 
-import com.bd.ufrn.projeto.interfaces.StrongEntity;
-import com.bd.ufrn.projeto.models.Hospede;
-import com.bd.ufrn.projeto.services.ConnectionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +8,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.bd.ufrn.projeto.interfaces.StrongEntity;
+import com.bd.ufrn.projeto.models.Hospede;
+import com.bd.ufrn.projeto.services.ConnectionFactory;
 
 @Repository
 public class HospedeRepository extends AbstractRepository<Hospede> implements StrongEntity<Hospede, String> {

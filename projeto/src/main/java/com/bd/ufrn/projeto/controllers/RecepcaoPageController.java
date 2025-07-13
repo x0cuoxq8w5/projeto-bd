@@ -68,9 +68,7 @@ public class RecepcaoPageController {
 
     @PostMapping("/reservas/nova")
     public String processarNovaReserva(@ModelAttribute("reserva") ReservaFormReq reserva) {
-        System.out.println(reserva);
-
-
+        reservaService.processarNovaReserva(reserva);
 
         return "redirect:/recepcao/reservas";
     }

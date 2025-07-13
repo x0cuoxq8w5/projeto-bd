@@ -25,6 +25,11 @@ public class ReservaFormReq {
     @Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", message = "CPF deve estar no formato 000.000.000-00")
     private String cpf;
 
+    @NotNull(message = "Data de nascimento é obrigatória")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dataNascimento;
+
     @NotBlank(message = "Tipo de quarto é obrigatório")
     private String tipoQuarto;
 
