@@ -17,7 +17,7 @@ public class ProdutoService implements CrudService<Produto, ProdutoDTO,Integer> 
 
     @Override
     public Produto get(Integer id) {
-        return null;
+        return produtoRepository.findById(id);
     }
 
     @Override

@@ -8,5 +8,5 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 public class Hospede extends Pessoa{
-    private boolean desativado;
+    protected boolean desativado;
 }
