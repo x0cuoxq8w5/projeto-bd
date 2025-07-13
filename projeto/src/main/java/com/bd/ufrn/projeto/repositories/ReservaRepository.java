@@ -250,5 +250,34 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
         }
     }
 
+    public List<Reserva> findActiveReservaByCpf(String cpf) {
+            String sql = """
+                SELECT r.*, h.nome_sobrenome, h.data_nasc,
+                       q.tipo, q.nao_perturbe, q.ocupado, q.marcado_para_limpeza
+                FROM reserva r
+                INNER JOIN hospede h ON r.cpf = h.cpf
+                INNER JOIN quarto q ON r.numero = q.numero
+                WHERE r.cpf = ?
+                    AND CURRENT_DATE >= r.data_inicio
+                    AND CURRENT_DATE <= r.data_fim
+                ORDER BY r.data_inicio
+                """;
     
+            List<Reserva> reservas = new ArrayList<>();
+    
+            try (Connection conn = connectionFactory.connection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+    
+                stmt.setString(1, cpf);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        reservas.add(mapResultSetToReserva(rs));
+                    }
+                }
+    
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return reservas;
+    }
 }

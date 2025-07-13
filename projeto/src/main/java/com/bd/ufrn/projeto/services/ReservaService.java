@@ -79,11 +79,9 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
         if (hospede == null) {
             return Optional.empty();
         }
-
-        return reservaRepository.findByHospede(hospede).stream()
-                .filter(r -> r.getDataEntrada() == null)
-                .min(Comparator.comparing(Reserva::getDataInicio))
-                .map(this::convertToDto);
+        return reservaRepository.findActiveReservaByCpf(cpf).stream()
+        .min(Comparator.comparing(Reserva::getDataInicio))
+        .map(this::convertToDto);
     }
 
     public void registrarEntrada(Integer reservaId) {
@@ -166,19 +164,4 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
                 .map(quarto -> new QuartoReservaRes((long) quarto.getNumero(), String.valueOf(quarto.getNumero()), quarto.getTipo(), false, false))
                 .collect(Collectors.toList());
     }
-
-//    public ReservaDTO formReqToDTO(ReservaFormReq reservaFormReq) {
-//        ReservaDTO reservaDTO = new ReservaDTO(
-//                null,
-//                reservaFormReq.getCpf(),
-//                LocalDateTime.now(),
-//                reservaFormReq.getDataFinal(),
-//                LocalDateTime.now(),
-//                reservaFormReq.getQuartoId(),
-//                reservaFormReq.getNome(),
-//                reservaFormReq.getTipoQuarto()
-//        );
-//
-//        return reservaDTO;
-//    }
 }
