@@ -1,5 +1,6 @@
 package com.bd.ufrn.projeto.services;
 
+import com.bd.ufrn.projeto.dtos.HospedeListDto;
 import com.bd.ufrn.projeto.dtos.HospedeDTO;
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Hospede;
@@ -46,5 +47,17 @@ public class HospedeService implements CrudService<Hospede,HospedeDTO,String> {
     @Override
     public List<Hospede> getAll() {
         return hospedeRepository.findAll();
+    }
+
+    public List<HospedeListDto> getAllAsDto() {
+        return hospedeRepository.findAll().stream().map(HospedeListDto::new).collect(java.util.stream.Collectors.toList());
+    }
+
+    public void toggleDesativado(String cpf) {
+        Hospede hospede = get(cpf);
+        if (hospede != null) {
+            hospede.setDesativado(!hospede.isDesativado());
+            hospedeRepository.save(hospede);
+        }
     }
 }

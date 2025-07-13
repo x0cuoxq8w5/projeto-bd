@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/produto")
+@RequestMapping("/api/produto")
 public class ProdutoController implements GenericController<Produto, ProdutoDTO, Integer> {
     @Autowired ProdutoService produtoService;
 

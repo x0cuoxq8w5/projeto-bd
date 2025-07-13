@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/funcionario")
+@RequestMapping("/api/funcionario")
 public class FuncionarioController implements GenericController<Funcionario, FuncionarioDTO, String> {
     @Autowired
     FuncionarioService funcionarioService;

@@ -52,6 +52,38 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
         return null;
     }
 
+    public List<Reserva> findByHospede(Hospede hospede) {
+        return findByCpf(hospede.getCpf());
+    }
+
+    public List<Integer> findQuartosOcupados(LocalDateTime dataInicio, LocalDateTime dataFim) {
+        String sql = """
+            SELECT DISTINCT r.numero
+            FROM reserva r
+            WHERE r.data_inicio < ? AND r.data_fim > ?
+        """;
+
+        List<Integer> quartosOcupadosIds = new ArrayList<>();
+
+        try (Connection conn = connectionFactory.connection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setTimestamp(1, Timestamp.valueOf(dataFim));
+            stmt.setTimestamp(2, Timestamp.valueOf(dataInicio));
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    quartosOcupadosIds.add(rs.getInt("numero"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return quartosOcupadosIds;
+    }
+
     public List<Reserva> findByCpf(String cpf) {
         String sql = """
             SELECT r.*, h.nome_sobrenome, h.data_nasc,
@@ -116,7 +148,7 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
 
         String insertSql = """
             INSERT INTO reserva (cpf, data_inicio, data_fim, data_entrada, data_saida, numero)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
         """;
 
         String updateSql = """
@@ -216,5 +248,36 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
             e.printStackTrace();
             throw new RuntimeException("Failed to delete reserva", e);
         }
+    }
+
+    public List<Reserva> findActiveReservaByCpf(String cpf) {
+            String sql = """
+                SELECT r.*, h.nome_sobrenome, h.data_nasc,
+                       q.tipo, q.nao_perturbe, q.ocupado, q.marcado_para_limpeza
+                FROM reserva r
+                INNER JOIN hospede h ON r.cpf = h.cpf
+                INNER JOIN quarto q ON r.numero = q.numero
+                WHERE r.cpf = ?
+                    AND CURRENT_DATE >= r.data_inicio
+                    AND CURRENT_DATE <= r.data_fim
+                ORDER BY r.data_inicio
+                """;
+    
+            List<Reserva> reservas = new ArrayList<>();
+    
+            try (Connection conn = connectionFactory.connection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+    
+                stmt.setString(1, cpf);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        reservas.add(mapResultSetToReserva(rs));
+                    }
+                }
+    
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return reservas;
     }
 }

@@ -7,7 +7,17 @@ module.exports = {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["luxury", "forest"],
+    themes: [
+    {
+      malocaBlue: {
+        "primary": "#37474F",
+        "secondary": "#9bcae0",
+        "accent": "#5ca4ed",
+        "neutral": "#21272c",
+        "base-100": "#ECEFF1",
+      }
+    },
+    ],
   },
 }
 

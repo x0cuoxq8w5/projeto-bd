@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Breadcrumb Fragment -->
+<div th:fragment="breadcrumb" class="breadcrumbs text-sm mb-6">
+    <ul th:with="breadcrumbs=${breadcrumbs}">
+        <li th:each="breadcrumb : ${breadcrumbs}"
+            th:class="${breadcrumb.active} ? 'text-primary font-medium' : ''">
+            <a th:if="${!breadcrumb.active}"
+               th:href="${breadcrumb.url}"
+               th:text="${breadcrumb.title}">
+            </a>
+            <span th:if="${breadcrumb.active}"
+                  th:text="${breadcrumb.title}">
+            </span>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
