@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     resetSelecaoQuarto();
 
     try {
-      const response = await fetch(`/recepcao/reservas/quartos-disponiveis?dataInicio=${dataInicio}&dataFim=${dataFim}`);
+      const response = await fetch(`/api/reservas/quartos-disponiveis?dataInicio=${dataInicio}&dataFim=${dataFim}`);
       if (!response.ok) {
         throw new Error('Erro ao buscar quartos.');
       }
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
     cpfMessage.textContent = '';
 
     try {
-      const response = await fetch(`/recepcao/hospedes/${cpf}`);
+      const response = await fetch(`/api/hospedes/${cpf}`);
       if (response.ok) {
         const hospede = await response.json();
 

@@ -4,7 +4,6 @@ import com.bd.ufrn.projeto.dtos.QuartoDTO;
 import com.bd.ufrn.projeto.interfaces.GenericController;
 import com.bd.ufrn.projeto.models.Quarto;
 import com.bd.ufrn.projeto.services.QuartoService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/quarto")
+@RequestMapping("/api/quarto")
 public class QuartoController implements GenericController<Quarto,QuartoDTO,Integer> {
     @Autowired
     QuartoService quartoService;

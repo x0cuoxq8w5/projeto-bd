@@ -97,7 +97,7 @@
             confirmarBtn.classList.add('hidden');
 
             try {
-                const response = await fetch(`/recepcao/reservas/buscar-por-cpf/${cpf}`);
+                const response = await fetch(`/api/reservas/buscar-por-cpf/${cpf}`);
                 if (response.ok) {
                     const reserva = await response.json();
                     document.getElementById('reservaId').value = reserva.id;

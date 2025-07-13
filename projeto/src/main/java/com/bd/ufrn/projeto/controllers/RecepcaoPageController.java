@@ -3,26 +3,24 @@ package com.bd.ufrn.projeto.controllers;
 import com.bd.ufrn.projeto.dtos.BreadcrumbItem;
 import com.bd.ufrn.projeto.dtos.QuartoReservaRes;
 import com.bd.ufrn.projeto.dtos.ReservaFormReq;
-import com.bd.ufrn.projeto.dtos.ReservaListDto;
-import com.bd.ufrn.projeto.models.Hospede;
+
+
 import com.bd.ufrn.projeto.services.HospedeService;
 import com.bd.ufrn.projeto.services.QuartoService;
 import com.bd.ufrn.projeto.services.ReservaService;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,15 +60,7 @@ public class RecepcaoPageController {
     }
 
 
-    @GetMapping("/reservas/quartos-disponiveis")
-    @ResponseBody
-    public List<QuartoReservaRes> getQuartosDisponiveis(@RequestParam("dataInicio") String dataInicio, @RequestParam("dataFim") String dataFim) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date dataInicioDate = formatter.parse(dataInicio);
-        Date dataFimDate = formatter.parse(dataFim);
 
-        return reservaService.findQuartosDisponiveis(dataInicioDate, dataFimDate);
-    }
 
 
     @PostMapping("/reservas/nova")
@@ -91,13 +81,7 @@ public class RecepcaoPageController {
         return "reservas/registrar-entrada";
     }
 
-    @GetMapping("/reservas/buscar-por-cpf/{cpf}")
-    @ResponseBody
-    public ResponseEntity<ReservaListDto> buscarReservaPorCpf(@PathVariable String cpf) {
-        return reservaService.findActiveReservaByCpf(cpf)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+
 
     @PostMapping("/reservas/registrar-entrada")
     public String registrarEntrada(@RequestParam("reservaId") Integer reservaId) {
@@ -105,15 +89,7 @@ public class RecepcaoPageController {
         return "redirect:/recepcao/reservas";
     }
 
-    @GetMapping("/hospedes/{cpf}")
-    @ResponseBody
-    public ResponseEntity<Hospede> getHospedeByCpf(@PathVariable String cpf) {
-        Hospede hospede = hospedeService.get(cpf);
-        if (hospede != null) {
-            return ResponseEntity.ok(hospede);
-        }
-        return ResponseEntity.notFound().build();
-    }
+
 
     @GetMapping("/reservas")
     public String listarReservas(Model model) {
