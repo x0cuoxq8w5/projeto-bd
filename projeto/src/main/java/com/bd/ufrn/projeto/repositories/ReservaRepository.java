@@ -52,6 +52,10 @@ public class ReservaRepository extends AbstractRepository<Reserva> implements St
         return null;
     }
 
+    public List<Reserva> findByHospede(Hospede hospede) {
+        return findByCpf(hospede.getCpf());
+    }
+
     public List<Integer> findQuartosOcupados(LocalDateTime dataInicio, LocalDateTime dataFim) {
         String sql = """
             SELECT DISTINCT r.numero

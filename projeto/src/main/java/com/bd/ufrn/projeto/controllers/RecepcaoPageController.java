@@ -3,6 +3,7 @@ package com.bd.ufrn.projeto.controllers;
 import com.bd.ufrn.projeto.dtos.BreadcrumbItem;
 import com.bd.ufrn.projeto.dtos.QuartoReservaRes;
 import com.bd.ufrn.projeto.dtos.ReservaFormReq;
+import com.bd.ufrn.projeto.dtos.ReservaListDto;
 import com.bd.ufrn.projeto.models.Hospede;
 import com.bd.ufrn.projeto.services.HospedeService;
 import com.bd.ufrn.projeto.services.QuartoService;
@@ -76,6 +77,31 @@ public class RecepcaoPageController {
     public String processarNovaReserva(@ModelAttribute("reserva") ReservaFormReq reserva) {
         reservaService.processarNovaReserva(reserva);
 
+        return "redirect:/recepcao/reservas";
+    }
+
+    @GetMapping("/reservas/registrar-entrada")
+    public String showRegistrarEntradaPage(Model model) {
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Reservas", "/recepcao/reservas", false));
+        breadcrumbs.add(new BreadcrumbItem("Registrar Entrada", "#", true));
+
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Registrar Entrada de Hóspede");
+        return "reservas/registrar-entrada";
+    }
+
+    @GetMapping("/reservas/buscar-por-cpf/{cpf}")
+    @ResponseBody
+    public ResponseEntity<ReservaListDto> buscarReservaPorCpf(@PathVariable String cpf) {
+        return reservaService.findActiveReservaByCpf(cpf)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/reservas/registrar-entrada")
+    public String registrarEntrada(@RequestParam("reservaId") Integer reservaId) {
+        reservaService.registrarEntrada(reservaId);
         return "redirect:/recepcao/reservas";
     }
 

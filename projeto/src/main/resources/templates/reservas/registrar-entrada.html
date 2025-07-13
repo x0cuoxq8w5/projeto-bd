@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html
+  lang="pt-BR"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/layout}"
+>
+  <head>
+    <title>Registrar Entrada</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <div class="max-w-2xl mx-auto">
+        <form
+          th:action="@{/recepcao/reservas/registrar-entrada}"
+          method="post"
+          class="space-y-6"
+        >
+          <!-- Card de Busca por CPF -->
+          <div class="card bg-base-100/80 backdrop-blur-sm shadow-xl border border-base-300/50">
+            <div class="card-body">
+              <h2 class="card-title mb-6 text-2xl">
+                <svg class="w-6 h-6 text-accent mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                Buscar Reserva por CPF
+              </h2>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">CPF do Hóspede</span>
+                </label>
+                <div class="relative">
+                  <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" class="input input-bordered w-full pr-10" maxlength="14" required />
+                  <span id="cpf-spinner" class="loading loading-spinner loading-sm absolute top-1/2 right-3 -translate-y-1/2 hidden"></span>
+                </div>
+                <div class="label">
+                  <span id="cpf-message" class="label-text-alt"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalhes da Reserva (inicialmente oculto) -->
+          <div id="reserva-details" class="hidden card bg-base-100/80 backdrop-blur-sm shadow-xl border border-base-300/50">
+            <div class="card-body">
+                <h2 class="card-title mb-6 text-2xl">
+                    <svg class="w-6 h-6 text-info mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Detalhes da Reserva
+                </h2>
+                <input type="hidden" id="reservaId" name="reservaId" />
+                <p><strong>Hóspede:</strong> <span id="hospede-nome"></span></p>
+                <p><strong>Quarto:</strong> <span id="quarto-numero"></span></p>
+                <p><strong>Período:</strong> <span id="periodo"></span></p>
+                <p><strong>Check-in status:</strong> <span id="checkin-status"></span></p>
+            </div>
+          </div>
+
+          <!-- Botões de Ação -->
+          <div class="flex gap-4 justify-end">
+            <a th:href="@{/recepcao/reservas}" class="btn btn-outline btn-lg">Cancelar</a>
+            <button type="submit" id="confirmar-entrada-btn" class="btn btn-success btn-lg hidden">
+              Confirmar Entrada
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const cpfInput = document.getElementById('cpf');
+          const cpfSpinner = document.getElementById('cpf-spinner');
+          const cpfMessage = document.getElementById('cpf-message');
+          const reservaDetails = document.getElementById('reserva-details');
+          const confirmarBtn = document.getElementById('confirmar-entrada-btn');
+
+          // Máscara de CPF
+          cpfInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+          });
+
+          cpfInput.addEventListener('blur', async function() {
+            const cpf = this.value;
+            if (cpf.length !== 14) {
+                reservaDetails.classList.add('hidden');
+                confirmarBtn.classList.add('hidden');
+                cpfMessage.textContent = '';
+                return;
+            }
+
+            cpfSpinner.classList.remove('hidden');
+            cpfMessage.textContent = '';
+            reservaDetails.classList.add('hidden');
+            confirmarBtn.classList.add('hidden');
+
+            try {
+                const response = await fetch(`/recepcao/reservas/buscar-por-cpf/${cpf}`);
+                if (response.ok) {
+                    const reserva = await response.json();
+                    document.getElementById('reservaId').value = reserva.id;
+                    document.getElementById('hospede-nome').textContent = reserva.hospedeNome;
+                    document.getElementById('quarto-numero').textContent = reserva.quartoNumero;
+                    const dataInicio = new Date(reserva.dataInicio).toLocaleDateString('pt-BR');
+                    const dataFim = new Date(reserva.dataFim).toLocaleDateString('pt-BR');
+                    document.getElementById('periodo').textContent = `${dataInicio} a ${dataFim}`;
+                    
+                    if(reserva.dataEntrada) {
+                        document.getElementById('checkin-status').textContent = new Date(reserva.dataEntrada).toLocaleString('pt-BR');
+                        cpfMessage.textContent = 'Check-in já foi realizado para esta reserva.';
+                        cpfMessage.className = 'label-text-alt text-warning';
+                    } else {
+                        document.getElementById('checkin-status').textContent = 'Pendente';
+                        cpfMessage.textContent = 'Reserva encontrada.';
+                        cpfMessage.className = 'label-text-alt text-success';
+                        confirmarBtn.classList.remove('hidden');
+                    }
+
+                    reservaDetails.classList.remove('hidden');
+                } else {
+                    cpfMessage.textContent = 'Nenhuma reserva ativa encontrada para este CPF.';
+                    cpfMessage.className = 'label-text-alt text-error';
+                }
+            } catch (error) {
+                console.error('Erro ao buscar reserva:', error);
+                cpfMessage.textContent = 'Erro ao buscar reserva. Tente novamente.';
+                cpfMessage.className = 'label-text-alt text-error';
+            } finally {
+                cpfSpinner.classList.add('hidden');
+            }
+          });
+        });
+      </script>
+    </th:block>
+  </body>
+</html>

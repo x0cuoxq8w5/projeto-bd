@@ -19,6 +19,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,12 +65,48 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
         return reservaRepository.findAll();
     }
 
-    public List<ReservaListDto> getAllAsDto() {
-        return reservaRepository.findAll().stream().map(ReservaListDto::new).collect(Collectors.toList());
+    public List<ReservaListDto> findAllReservas() {
+        return reservaRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private ReservaListDto convertToDto(Reserva reserva) {
+        return new ReservaListDto(reserva);
+    }
+
+    public Optional<ReservaListDto> findActiveReservaByCpf(String cpf) {
+        Hospede hospede = hospedeService.get(cpf);
+        if (hospede == null) {
+            return Optional.empty();
+        }
+
+        return reservaRepository.findByHospede(hospede).stream()
+                .filter(r -> r.getDataEntrada() == null)
+                .min(Comparator.comparing(Reserva::getDataInicio))
+                .map(this::convertToDto);
+    }
+
+    public void registrarEntrada(Integer reservaId) {
+        Reserva reserva = reservaRepository.findById(reservaId);
+        if (reserva == null) {
+            throw new IllegalArgumentException("Reserva não encontrada");
+        }
+
+        if (reserva.getDataEntrada() != null) {
+            throw new IllegalStateException("Check-in já foi realizado para esta reserva.");
+        }
+
+        reserva.setDataEntrada(LocalDateTime.now());
+        reservaRepository.save(reserva);
     }
 
     public List<Reserva> getByCpf(String cpf) {
         return reservaRepository.findByCpf(cpf);
+    }
+
+    public List<ReservaListDto> getAllAsDto() {
+        return reservaRepository.findAll().stream().map(ReservaListDto::new).collect(Collectors.toList());
     }
 
     public void processarNovaReserva(ReservaFormReq reservaFormReq) {
