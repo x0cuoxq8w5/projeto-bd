@@ -89,6 +89,10 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
         if (reserva == null) {
             throw new IllegalArgumentException("Reserva não encontrada");
         }
+        if (reserva.getQuarto().isMarcadoParaLimpeza()) {
+            throw new IllegalStateException("Não é possível fazer o check-in. O quarto está marcado para limpeza.");
+        }
+
         if (reserva.getDataEntrada() != null) {
             throw new IllegalStateException("Check-in já foi realizado para esta reserva.");
         }
