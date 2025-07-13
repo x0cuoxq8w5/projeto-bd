@@ -3,13 +3,17 @@ package com.bd.ufrn.projeto.controllers;
 import com.bd.ufrn.projeto.dtos.BreadcrumbItem;
 import com.bd.ufrn.projeto.dtos.QuartoReservaRes;
 import com.bd.ufrn.projeto.dtos.ReservaFormReq;
+import com.bd.ufrn.projeto.models.Hospede;
+import com.bd.ufrn.projeto.services.HospedeService;
 import com.bd.ufrn.projeto.services.QuartoService;
 import com.bd.ufrn.projeto.services.ReservaService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,11 +32,13 @@ public class RecepcaoPageController {
 
     private final ReservaService reservaService;
     private final QuartoService quartoService;
+    private final HospedeService hospedeService;
 
     @Autowired
-    public RecepcaoPageController(ReservaService reservaService, QuartoService quartoService) {
+    public RecepcaoPageController(ReservaService reservaService, QuartoService quartoService, HospedeService hospedeService) {
         this.reservaService = reservaService;
         this.quartoService = quartoService;
+        this.hospedeService = hospedeService;
     }
 
 
@@ -71,6 +77,16 @@ public class RecepcaoPageController {
         reservaService.processarNovaReserva(reserva);
 
         return "redirect:/recepcao/reservas";
+    }
+
+    @GetMapping("/hospedes/{cpf}")
+    @ResponseBody
+    public ResponseEntity<Hospede> getHospedeByCpf(@PathVariable String cpf) {
+        Hospede hospede = hospedeService.get(cpf);
+        if (hospede != null) {
+            return ResponseEntity.ok(hospede);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/reservas")

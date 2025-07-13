@@ -10,12 +10,17 @@ document.addEventListener('DOMContentLoaded', function () {
   const numeroSelecionado = document.getElementById('numero-selecionado');
   const detalhesQuarto = document.getElementById('detalhes-quarto');
   const quartoIdInput = document.getElementById('quartoId');
+  const cpfInput = document.getElementById('cpf');
+  const cpfSpinner = document.getElementById('cpf-spinner');
+  const cpfMessage = document.getElementById('cpf-message');
+  const nomeInput = document.getElementById('nome');
+  const dataNascimentoInput = document.getElementById('dataNascimento');
 
   let quartoAtualSelecionado = null;
-  let todosOsQuartosDisponiveis = []; // Armazena os quartos buscados
+  let todosOsQuartosDisponiveis = [];
 
 
-  // Função para buscar e renderizar quartos
+  
   async function fetchAndRenderQuartos() {
     const dataInicio = dataInicioInput.value;
     const dataFim = dataFinalInput.value;
@@ -105,6 +110,56 @@ document.addEventListener('DOMContentLoaded', function () {
     return tipos[tipo] || tipo;
   }
 
+  async function fetchHospedePorCpf() {
+    const cpf = cpfInput.value;
+    if (cpf.length !== 14) { 
+      resetHospedeFields();
+      return;
+    }
+
+    cpfSpinner.classList.remove('hidden');
+    cpfMessage.textContent = '';
+
+    try {
+      const response = await fetch(`/recepcao/hospedes/${cpf}`);
+      if (response.ok) {
+        const hospede = await response.json();
+        nomeInput.value = hospede.nome;
+        // Formata a data para YYYY-MM-DD
+        dataNascimentoInput.value = hospede.dataNascimento.substring(0, 10);
+        nomeInput.readOnly = true;
+        dataNascimentoInput.readOnly = true;
+        cpfMessage.textContent = 'Hóspede encontrado.';
+        cpfMessage.className = 'label-text-alt text-success';
+      } else {
+        resetHospedeFields(true);
+        cpfMessage.textContent = 'Novo hóspede. Preencha os dados.';
+        cpfMessage.className = 'label-text-alt text-info';
+      }
+    } catch (error) {
+      console.error('Erro ao buscar hóspede:', error);
+      resetHospedeFields(true);
+      cpfMessage.textContent = 'Erro ao buscar CPF. Tente novamente.';
+      cpfMessage.className = 'label-text-alt text-error';
+    }
+    finally {
+        cpfSpinner.classList.add('hidden');
+    }
+  }
+
+  function resetHospedeFields(enableFields = false) {
+      if(enableFields){
+          nomeInput.value = '';
+          dataNascimentoInput.value = '';
+          nomeInput.readOnly = false;
+          dataNascimentoInput.readOnly = false;
+      } else {
+          nomeInput.readOnly = true;
+          dataNascimentoInput.readOnly = true;
+      }
+      cpfMessage.textContent = '';
+  }
+
   // Event Listeners
   dataInicioInput.addEventListener('change', fetchAndRenderQuartos);
   dataFinalInput.addEventListener('change', fetchAndRenderQuartos);
@@ -114,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     filtrarERenderizar(tipoQuartoSelect.value);
   });
+  cpfInput.addEventListener('blur', fetchHospedePorCpf);
 
   // Inicialização
   fetchAndRenderQuartos();
