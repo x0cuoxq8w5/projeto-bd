@@ -2,6 +2,7 @@ package com.bd.ufrn.projeto.services;
 
 import com.bd.ufrn.projeto.dtos.ItemPedidoDTO;
 import com.bd.ufrn.projeto.dtos.PedidoDTO;
+import com.bd.ufrn.projeto.dtos.ProdutoDTO;
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Pedido;
 import com.bd.ufrn.projeto.models.Produto;
@@ -10,6 +11,8 @@ import com.bd.ufrn.projeto.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.bd.ufrn.projeto.dtos.ItemPedido;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,8 +60,17 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
     }
 
     @Override
+    @Transactional
     public void update(Integer id, PedidoDTO pedidoDTO) {
         Pedido pedido = get(id);
+
+        // Devolver itens antigos ao estoque
+        pedido.getItemPedidos().forEach(item -> {
+            Produto produto = item.getProduto();
+            int novaQuantidade = produto.getQuantidade() + item.getQuantidade();
+            produtoService.update(produto.getId(), new com.bd.ufrn.projeto.dtos.ProdutoDTO(produto.getId(), produto.getNome(), produto.getPrecoAtual(), novaQuantidade));
+        });
+
         if (pedidoDTO.dataEntrega() != null) pedido.setDataEntrega(pedidoDTO.dataEntrega());
         if (pedidoDTO.dataPedido() != null) pedido.setDataPedido(pedidoDTO.dataPedido());
         if (pedidoDTO.numeroQuarto() != null) pedido.setQuarto(quartoService.get(pedidoDTO.numeroQuarto()));
@@ -67,17 +79,27 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
             List<ItemPedido> itens = pedidoDTO.itens().stream()
                     .filter(java.util.Objects::nonNull)
                     .map(itemDTO -> {
-                Produto produto = produtoService.get(itemDTO.getProdutoId());
-                return ItemPedido.builder()
-                        .produto(produto)
-                        .quantidade(itemDTO.getQuantidade())
-                        .preco(produto.getPrecoAtual())
-                        .build();
-            }).toList();
+                        Produto produto = produtoService.get(itemDTO.getProdutoId());
+                        if (produto.getQuantidade() < itemDTO.getQuantidade()) {
+                            throw new RuntimeException("Não há estoque suficiente para o produto: " + produto.getNome());
+                        }
+                        return ItemPedido.builder()
+                                .produto(produto)
+                                .quantidade(itemDTO.getQuantidade())
+                                .preco(produto.getPrecoAtual())
+                                .build();
+                    }).toList();
             pedido.setItemPedidos(itens);
         }
 
         pedidoRepository.save(pedido);
+
+        // Atualizar estoque com novos itens
+        pedido.getItemPedidos().forEach(item -> {
+            Produto produto = item.getProduto();
+            int novaQuantidade = produto.getQuantidade() - item.getQuantidade();
+            produtoService.update(produto.getId(), new ProdutoDTO(produto.getId(), produto.getNome(), produto.getPrecoAtual(), novaQuantidade));
+        });
     }
 
     @Override

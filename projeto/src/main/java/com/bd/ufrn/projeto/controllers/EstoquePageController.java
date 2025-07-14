@@ -129,9 +129,23 @@ public class EstoquePageController {
     }
 
     @PostMapping("/pedidos/editar/{id}")
-    public String salvarPedidoEditado(@PathVariable Integer id, @ModelAttribute("pedido") PedidoDTO pedidoDTO) {
-        pedidoService.update(id, pedidoDTO);
-        return "redirect:/estoque/pedidos";
+    public String salvarPedidoEditado(@PathVariable Integer id, @ModelAttribute("pedido") PedidoDTO pedidoDTO, Model model) {
+        try {
+            pedidoService.update(id, pedidoDTO);
+            return "redirect:/estoque/pedidos";
+        } catch (RuntimeException e) {
+            List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+            breadcrumbs.add(new BreadcrumbItem("Pedidos", "/estoque/pedidos", false));
+            breadcrumbs.add(new BreadcrumbItem("Editar", null, true));
+
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("breadcrumbs", breadcrumbs);
+            model.addAttribute("pageTitle", "Editar Pedido");
+            model.addAttribute("pedido", pedidoDTO);
+            model.addAttribute("produtos", produtoService.getAllAsDto());
+
+            return "estoque/editar-pedido";
+        }
     }
 
     @GetMapping("/pedidos/novo")
