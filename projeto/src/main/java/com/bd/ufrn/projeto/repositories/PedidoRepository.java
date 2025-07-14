@@ -263,6 +263,32 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
         }
     }
 
+    public double calculateTotalCostForReserva(int quartoNumero, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        String sql = """
+            SELECT SUM(php.preco_item * php.quantidade_item) AS total_cost
+            FROM pedido p
+            JOIN pedido_has_produto php ON p.id_pedido = php.id_pedido
+            WHERE p.numero_quarto = ? AND p.data_pedido >= ? AND p.data_pedido <= ?
+        """;
+
+        try (Connection connection = connectionFactory.connection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setInt(1, quartoNumero);
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(dataInicio));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(dataFim));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble("total_cost");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
     @Override
     public List<Pedido> findAll() {
         String sql = """
