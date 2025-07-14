@@ -16,7 +16,7 @@ import java.util.List;
 public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
     @Autowired private PedidoRepository pedidoRepository;
     @Autowired private PedidoHasProdutoRepository pedidoHasProdutoRepository;
-    @Autowired private HospedeService hospedeService;
+    @Autowired private QuartoService quartoService;
     @Autowired private ProdutoService produtoService;
 
     @Override
@@ -29,7 +29,7 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
         List<Produto> produtos = produtoService.getByIds(pedidoDTO.idProdutos());
         Pedido pedido = Pedido.builder()
                 .dataPedido(LocalDateTime.now())
-                .hospede(hospedeService.get(pedidoDTO.cpfHospede()))
+                .quarto(quartoService.get(pedidoDTO.numeroQuarto()))
                 .build();
         pedidoRepository.save(pedido);
         //A func do repository disso DEVE criar o pedidoHasProduto atrelado a este pedido dentro de uma transação a fim

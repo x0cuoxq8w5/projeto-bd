@@ -15,6 +15,6 @@ public class Pedido {
     private Integer id;
     private LocalDateTime dataPedido;
     private LocalDateTime dataEntrega;
-    private Hospede hospede;
+    private Quarto quarto;
     private List<ItemPedidoDTO> itemPedidoDTOS;
 }

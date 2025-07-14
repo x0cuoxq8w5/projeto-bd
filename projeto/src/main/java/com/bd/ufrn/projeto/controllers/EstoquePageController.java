@@ -4,6 +4,7 @@ import com.bd.ufrn.projeto.dtos.BreadcrumbItem;
 import com.bd.ufrn.projeto.dtos.ProdutoDTO;
 import com.bd.ufrn.projeto.models.Produto;
 import com.bd.ufrn.projeto.services.ProdutoService;
+import com.bd.ufrn.projeto.services.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,10 +22,12 @@ import java.util.List;
 public class EstoquePageController {
 
     private final ProdutoService produtoService;
+    private final PedidoService pedidoService;
 
     @Autowired
-    public EstoquePageController(ProdutoService produtoService) {
+    public EstoquePageController(ProdutoService produtoService, PedidoService pedidoService) {
         this.produtoService = produtoService;
+        this.pedidoService = pedidoService;
     }
 
     @GetMapping("/produtos")
@@ -78,5 +81,17 @@ public class EstoquePageController {
     public String salvarProdutoEditado(@PathVariable Integer id, @ModelAttribute("produto") ProdutoDTO produtoDTO) {
         produtoService.update(id, produtoDTO);
         return "redirect:/estoque/produtos";
+    }
+
+    @GetMapping("/pedidos")
+    public String listarPedidos(Model model) {
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Pedidos", null, true));
+
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Lista de Pedidos");
+        model.addAttribute("pedidos", pedidoService.getAll());
+
+        return "estoque/lista-pedidos";
     }
 }

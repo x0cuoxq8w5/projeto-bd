@@ -7,7 +7,7 @@ public record PedidoDTO(
         Integer id,
         LocalDateTime dataPedido,
         LocalDateTime dataEntrega,
-        String cpfHospede,
+        Integer numeroQuarto,
         List<Integer> idProdutos
 ) {
 }
