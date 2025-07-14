@@ -5,6 +5,7 @@ import com.bd.ufrn.projeto.dtos.ReservaDTO;
 import com.bd.ufrn.projeto.dtos.ReservaListDto;
 import com.bd.ufrn.projeto.interfaces.GenericController;
 import com.bd.ufrn.projeto.models.Reserva;
+import com.bd.ufrn.projeto.services.PedidoService;
 import com.bd.ufrn.projeto.services.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,9 @@ import java.util.List;
 public class ReservaController implements GenericController<Reserva, ReservaDTO, Integer> {
     @Autowired
     ReservaService reservaService;
+
+    @Autowired
+    PedidoService pedidoService;
 
     @Override
     @GetMapping("/{id}")
@@ -70,5 +74,15 @@ public class ReservaController implements GenericController<Reserva, ReservaDTO,
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(reservas);
+    }
+
+    @GetMapping("/{id}/custo-produtos")
+    public ResponseEntity<Double> getCustoProdutos(@PathVariable Integer id) {
+        try {
+            double custoTotal = pedidoService.getCustoTotalPorReserva(id);
+            return ResponseEntity.ok(custoTotal);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

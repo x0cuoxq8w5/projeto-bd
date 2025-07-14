@@ -113,7 +113,7 @@
           cpfInput.addEventListener('blur', async function () {
             const cpf = this.value;
             if (cpf.length !== 14) {
-              reservaDetails.classList.add('hidden');
+              reservasListContainer.classList.add('hidden');
               confirmarBtn.classList.add('hidden');
               cpfMessage.textContent = '';
               return;
@@ -151,6 +151,10 @@
                     const form = document.createElement('div');
                     form.className = 'space-y-4';
 
+                    const custoContainer = document.createElement('div');
+                    custoContainer.id = 'custo-produtos-details';
+                    custoContainer.className = 'mt-6';
+
                     reservasComCheckin.forEach(reserva => {
                       const dataInicio = new Date(reserva.dataInicio).toLocaleDateString('pt-BR');
                       const dataFim = new Date(reserva.dataFim).toLocaleDateString('pt-BR');
@@ -167,8 +171,45 @@
                       radioInput.name = 'reservaId';
                       radioInput.className = 'radio radio-primary';
                       radioInput.value = reserva.id;
-                      radioInput.addEventListener('change', () => {
+                      radioInput.addEventListener('change', async () => {
                         confirmarBtn.classList.remove('hidden');
+
+                        custoContainer.innerHTML = `<div class="text-center p-4"><span class="loading loading-spinner loading-md"></span><span class="ml-2 font-medium">Calculando custos...</span></div>`;
+
+                        try {
+                            const response = await fetch(`/api/reservas/${reserva.id}/custo-produtos`);
+                            if (response.ok) {
+                                const custo = await response.json();
+                                const formattedCusto = custo.toFixed(2).replace('.', ',');
+                                custoContainer.innerHTML = `
+                                    <div class="alert alert-info shadow-lg mt-4">
+                                        <div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            <span>Custo total com produtos: <strong>R$ ${formattedCusto}</strong></span>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                custoContainer.innerHTML = `
+                                    <div class="alert alert-warning shadow-lg mt-4">
+                                        <div>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                            <span>Não foi possível calcular os custos extras para esta reserva.</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        } catch (error) {
+                            console.error('Erro ao calcular custo de produtos:', error);
+                            custoContainer.innerHTML = `
+                                <div class="alert alert-error shadow-lg mt-4">
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <span>Erro de comunicação com o servidor ao calcular custos.</span>
+                                    </div>
+                                </div>
+                            `;
+                        }
                       });
 
                       const span = document.createElement('span');
@@ -185,6 +226,7 @@
                     });
 
                     cardBody.appendChild(form);
+                    cardBody.appendChild(custoContainer);
                     card.appendChild(cardBody);
                     reservasListContainer.appendChild(card);
                     reservasListContainer.classList.remove('hidden');

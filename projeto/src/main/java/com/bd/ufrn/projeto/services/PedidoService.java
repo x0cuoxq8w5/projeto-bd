@@ -6,8 +6,9 @@ import com.bd.ufrn.projeto.dtos.ProdutoDTO;
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Pedido;
 import com.bd.ufrn.projeto.models.Produto;
-
+import com.bd.ufrn.projeto.models.Reserva;
 import com.bd.ufrn.projeto.repositories.PedidoRepository;
+import com.bd.ufrn.projeto.repositories.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.bd.ufrn.projeto.dtos.ItemPedido;
@@ -21,6 +22,7 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
     @Autowired private PedidoRepository pedidoRepository;
     @Autowired private QuartoService quartoService;
     @Autowired private ProdutoService produtoService;
+    @Autowired private ReservaRepository reservaRepository;
 
     @Override
     public Pedido get(Integer id) {
@@ -149,5 +151,20 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
                 itemDTOs,
                 custoTotal
         );
+    }
+
+    public double getCustoTotalPorReserva(Integer reservaId) {
+        Reserva reserva = reservaRepository.findById(reservaId);
+        if (reserva == null) {
+            throw new RuntimeException("Reserva não encontrada");
+        }
+
+        if (reserva.getDataEntrada() == null) {
+            throw new IllegalStateException("A reserva selecionada não possui data de check-in.");
+        }
+
+        LocalDateTime dataFimCalculo = LocalDateTime.now();
+
+        return pedidoRepository.calculateTotalCostForReserva(reserva.getQuarto().getNumero(), reserva.getDataEntrada(), dataFimCalculo);
     }
 }
