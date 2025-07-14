@@ -133,4 +133,24 @@ public class EstoquePageController {
         pedidoService.update(id, pedidoDTO);
         return "redirect:/estoque/pedidos";
     }
+
+    @GetMapping("/pedidos/novo")
+    public String novoPedidoForm(Model model) {
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Pedidos", "/estoque/pedidos", false));
+        breadcrumbs.add(new BreadcrumbItem("Novo", null, true));
+
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Novo Pedido");
+        model.addAttribute("pedido", new PedidoDTO(null, null, null, null, new ArrayList<>(), 0.0));
+        model.addAttribute("produtos", produtoService.getAllAsDto());
+
+        return "estoque/novo-pedido";
+    }
+
+    @PostMapping("/pedidos/novo")
+    public String salvarNovoPedido(@ModelAttribute("pedido") PedidoDTO pedidoDTO) {
+        pedidoService.create(pedidoDTO);
+        return "redirect:/estoque/pedidos";
+    }
 }
