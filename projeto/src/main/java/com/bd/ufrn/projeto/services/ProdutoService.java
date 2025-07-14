@@ -36,10 +36,9 @@ public class ProdutoService implements CrudService<Produto, ProdutoDTO,Integer> 
     public void update(Integer id, ProdutoDTO produtoDTO) {
         Produto produto = get(id);
         if(produtoDTO.nome() != null) produto.setNome(produtoDTO.nome());
-        if(produtoDTO.quantidade() != null) produto.setQuantidade(produtoDTO.quantidade());
+        produto.setQuantidade(produtoDTO.quantidade());
         if(produtoDTO.precoAtual() != null) produto.setPrecoAtual(produtoDTO.precoAtual());
         produtoRepository.save(produto);
-
     }
 
     @Override
