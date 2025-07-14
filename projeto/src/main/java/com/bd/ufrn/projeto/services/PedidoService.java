@@ -1,10 +1,11 @@
 package com.bd.ufrn.projeto.services;
 
+import com.bd.ufrn.projeto.dtos.ItemPedidoDTO;
 import com.bd.ufrn.projeto.dtos.PedidoDTO;
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Pedido;
 import com.bd.ufrn.projeto.models.Produto;
-import com.bd.ufrn.projeto.repositories.PedidoHasProdutoRepository;
+
 import com.bd.ufrn.projeto.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,6 @@ import java.util.List;
 @Service
 public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
     @Autowired private PedidoRepository pedidoRepository;
-    @Autowired private PedidoHasProdutoRepository pedidoHasProdutoRepository;
     @Autowired private QuartoService quartoService;
     @Autowired private ProdutoService produtoService;
 
@@ -77,5 +77,43 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
     @Override
     public List<Pedido> getAll() {
         return pedidoRepository.findAll();
+    }
+
+    public List<PedidoDTO> getAllAsDto() {
+        return pedidoRepository.findAll().stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    public PedidoDTO getByIdAsDto(Integer id) {
+        Pedido pedido = get(id);
+        if (pedido == null) {
+            return null; 
+        }
+        return convertToDto(pedido);
+    }
+
+    private PedidoDTO convertToDto(Pedido pedido) {
+        List<ItemPedidoDTO> itemDTOs = pedido.getItemPedidos() != null ? pedido.getItemPedidos().stream().map(item -> {
+            ItemPedidoDTO itemDto = new ItemPedidoDTO();
+            itemDto.setProdutoId(item.getProduto().getId());
+            itemDto.setProdutoNome(item.getProduto().getNome());
+            itemDto.setQuantidade(item.getQuantidade());
+            itemDto.setPreco(item.getPreco());
+            return itemDto;
+        }).toList() : new java.util.ArrayList<>();
+
+        Double custoTotal = itemDTOs.stream()
+                .mapToDouble(item -> item.getPreco() * item.getQuantidade())
+                .sum();
+
+        return new PedidoDTO(
+                pedido.getId(),
+                pedido.getDataPedido(),
+                pedido.getDataEntrega(),
+                pedido.getQuarto().getNumero(),
+                itemDTOs,
+                custoTotal
+        );
     }
 }

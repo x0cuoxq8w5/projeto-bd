@@ -8,6 +8,7 @@ public record PedidoDTO(
         LocalDateTime dataPedido,
         LocalDateTime dataEntrega,
         Integer numeroQuarto,
-        List<ItemPedidoDTO> itens
+        List<ItemPedidoDTO> itens,
+        Double custoTotal
 ) {
 }

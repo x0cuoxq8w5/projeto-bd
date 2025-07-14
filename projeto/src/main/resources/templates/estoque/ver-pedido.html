@@ -21,7 +21,7 @@
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-600">Quarto:</p>
-              <p class="text-lg text-gray-800" th:text="${pedido.quarto.numero}"></p>
+              <p class="text-lg text-gray-800" th:text="${pedido.numeroQuarto}"></p>
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-600">Data do Pedido:</p>
@@ -33,7 +33,7 @@
             </div>
             <div>
               <p class="text-sm font-semibold text-gray-600">Custo Total:</p>
-              <p class="text-lg text-gray-800 font-bold" th:text="'R$ ' + ${#numbers.formatDecimal(pedido.custoTotal, 1, 2)}"></p>
+              <p class="text-lg text-gray-800 font-bold" th:text="'R$ ' + ${#numbers.formatDecimal(pedido.custoTotal, 1, 'POINT', 2, 'COMMA')}"></p>
             </div>
           </div>
 
@@ -49,11 +49,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr th:each="item : ${pedido.itemPedidos}">
-                  <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${item.produto.nome}"></td>
+                <tr th:each="item : ${pedido.itens}">
+                  <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${item.produtoNome}"></td>
                   <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${item.quantidade}"></td>
-                  <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="'R$ ' + ${#numbers.formatDecimal(item.preco, 1, 2)}"></td>
-                  <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="'R$ ' + ${#numbers.formatDecimal(item.preco * item.quantidade, 1, 2)}"></td>
+                  <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="'R$ ' + ${#numbers.formatDecimal(item.preco, 1, 'POINT', 2, 'COMMA')}"></td>
+                  <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="'R$ ' + ${#numbers.formatDecimal(item.preco * item.quantidade, 1, 'POINT', 2, 'COMMA')}"></td>
                 </tr>
               </tbody>
             </table>

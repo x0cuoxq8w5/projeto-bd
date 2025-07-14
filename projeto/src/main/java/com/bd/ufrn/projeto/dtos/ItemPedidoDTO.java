@@ -7,5 +7,7 @@ import lombok.Setter;
 @Setter
 public class ItemPedidoDTO {
     private Integer produtoId;
+    private String produtoNome;
     private int quantidade;
+    private double preco;
 }

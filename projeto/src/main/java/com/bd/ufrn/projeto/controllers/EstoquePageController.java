@@ -90,7 +90,7 @@ public class EstoquePageController {
 
         model.addAttribute("breadcrumbs", breadcrumbs);
         model.addAttribute("pageTitle", "Lista de Pedidos");
-        model.addAttribute("pedidos", pedidoService.getAll());
+        model.addAttribute("pedidos", pedidoService.getAllAsDto());
 
         return "estoque/lista-pedidos";
     }
@@ -103,7 +103,7 @@ public class EstoquePageController {
 
         model.addAttribute("breadcrumbs", breadcrumbs);
         model.addAttribute("pageTitle", "Ver Pedido");
-        model.addAttribute("pedido", pedidoService.get(id));
+        model.addAttribute("pedido", pedidoService.getByIdAsDto(id));
 
         return "estoque/ver-pedido";
     }
