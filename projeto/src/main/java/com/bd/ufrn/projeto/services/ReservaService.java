@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
-import java.util.Comparator;
-import java.util.Optional;
+
+
 import java.util.stream.Collectors;
 
 @Service
@@ -74,14 +74,14 @@ public class ReservaService implements CrudService<Reserva, ReservaDTO,Integer> 
         return new ReservaListDto(reserva);
     }
 
-    public Optional<ReservaListDto> findActiveReservaByCpf(String cpf) {
+    public List<ReservaListDto> findActiveReservasByCpf(String cpf) {
         Hospede hospede = hospedeService.get(cpf);
         if (hospede == null) {
-            return Optional.empty();
+            return List.of();
         }
         return reservaRepository.findActiveReservaByCpf(cpf).stream()
-        .min(Comparator.comparing(Reserva::getDataInicio))
-        .map(this::convertToDto);
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     public void registrarEntrada(Integer reservaId) {

@@ -64,9 +64,11 @@ public class ReservaController implements GenericController<Reserva, ReservaDTO,
     }
 
     @GetMapping("/buscar-por-cpf/{cpf}")
-    public ResponseEntity<ReservaListDto> buscarReservaPorCpf(@PathVariable String cpf) {
-        return reservaService.findActiveReservaByCpf(cpf)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<ReservaListDto>> buscarReservasPorCpf(@PathVariable String cpf) {
+        List<ReservaListDto> reservas = reservaService.findActiveReservasByCpf(cpf);
+        if (reservas.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(reservas);
     }
 }
