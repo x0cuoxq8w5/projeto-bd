@@ -2,7 +2,7 @@ package com.bd.ufrn.projeto.repositories;
 
 import com.bd.ufrn.projeto.models.Quarto;
 
-import com.bd.ufrn.projeto.dtos.ItemPedidoDTO;
+import com.bd.ufrn.projeto.dtos.ItemPedido;
 import com.bd.ufrn.projeto.interfaces.StrongEntity;
 
 import com.bd.ufrn.projeto.models.Pedido;
@@ -63,14 +63,14 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
                                     .dataPedido(dataPedidoTs != null ? dataPedidoTs.toLocalDateTime() : null)
                                     .dataEntrega(dataEntregaTs != null ? dataEntregaTs.toLocalDateTime() : null)
                                     .quarto(quarto)
-                                    .itemPedidoDTOS(new ArrayList<>()) 
+                                    .itemPedidos(new ArrayList<>())
                                     .build();
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
                         }
                     });
 
-                    ItemPedidoDTO item = ItemPedidoDTO.builder()
+                    ItemPedido item = ItemPedido.builder()
                             .produto(Produto.builder()
                                     .id(resultSet.getInt("id_produto"))
                                     .nome(resultSet.getString("nome"))
@@ -81,7 +81,7 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
                             .quantidade(resultSet.getInt("quantidade_item"))
                             .build();
 
-                    pedido.getItemPedidoDTOS().add(item);
+                    pedido.getItemPedidos().add(item);
                 }
                 pedidos.addAll(pedidoMap.values());
             }
@@ -136,12 +136,12 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
                 .dataPedido(dataPedidoTs != null ? dataPedidoTs.toLocalDateTime() : null)
                 .dataEntrega(dataEntregaTs != null ? dataEntregaTs.toLocalDateTime() : null)
                 .quarto(quarto)
-                .itemPedidoDTOS(new ArrayList<>()) // Init empty list
+                .itemPedidos(new ArrayList<>()) // Init empty list
                 .build();
 
         // First row was read, process items
         do {
-            ItemPedidoDTO item = ItemPedidoDTO.builder()
+            ItemPedido item = ItemPedido.builder()
                     .produto(Produto.builder()
                             .id(resultSet.getInt("id_produto"))
                             .nome(resultSet.getString("nome"))
@@ -152,7 +152,7 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
                     .quantidade(resultSet.getInt("quantidade_item"))
                     .build();
 
-            pedido.getItemPedidoDTOS().add(item);
+            pedido.getItemPedidos().add(item);
         } while (resultSet.next());
 
         return pedido;
@@ -206,7 +206,7 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
 
             // Insert all items
             try (PreparedStatement stmt = connection.prepareStatement(insertItemSql)) {
-                for (ItemPedidoDTO item : pedido.getItemPedidoDTOS()) {
+                for (ItemPedido item : pedido.getItemPedidos()) {
                     stmt.setInt(1, pedido.getId());
                     stmt.setInt(2, item.getProduto().getId());
                     stmt.setDouble(3, item.getPreco());
@@ -285,7 +285,7 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
                             .dataEntrega(rs.getTimestamp("data_entrega") != null ?
                                     rs.getTimestamp("data_entrega").toLocalDateTime() : null)
                             .quarto(quarto)
-                            .itemPedidoDTOS(new ArrayList<>())
+                            .itemPedidos(new ArrayList<>())
                             .build();
 
                     pedidoMap.put(pedidoId, pedido);
@@ -300,13 +300,13 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
                             .quantidade(rs.getInt("quantidade"))
                             .build();
 
-                    ItemPedidoDTO item = ItemPedidoDTO.builder()
+                    ItemPedido item = ItemPedido.builder()
                             .produto(produto)
                             .preco(rs.getDouble("preco_item"))
                             .quantidade(rs.getInt("quantidade_item"))
                             .build();
 
-                    pedido.getItemPedidoDTOS().add(item);
+                    pedido.getItemPedidos().add(item);
                 }
             }
 

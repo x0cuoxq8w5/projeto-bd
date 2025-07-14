@@ -49,7 +49,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr th:each="item : ${pedido.itemPedidoDTOS}">
+                <tr th:each="item : ${pedido.itemPedidos}">
                   <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${item.produto.nome}"></td>
                   <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${item.quantidade}"></td>
                   <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="'R$ ' + ${#numbers.formatDecimal(item.preco, 1, 2)}"></td>

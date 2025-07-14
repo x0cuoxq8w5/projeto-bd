@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class ItemPedidoDTO {
+public class ItemPedido {
     private Produto produto;
     private double preco;
     private int quantidade;

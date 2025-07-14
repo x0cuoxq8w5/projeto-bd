@@ -26,12 +26,6 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
 
     @Override
     public void create(PedidoDTO pedidoDTO) {
-        List<Produto> produtos = produtoService.getByIds(pedidoDTO.idProdutos());
-        Pedido pedido = Pedido.builder()
-                .dataPedido(LocalDateTime.now())
-                .quarto(quartoService.get(pedidoDTO.numeroQuarto()))
-                .build();
-        pedidoRepository.save(pedido);
         //A func do repository disso DEVE criar o pedidoHasProduto atrelado a este pedido dentro de uma transação a fim
         //de impedir inconsistências no BD
     }

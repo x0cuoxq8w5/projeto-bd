@@ -1,6 +1,6 @@
 package com.bd.ufrn.projeto.models;
 
-import com.bd.ufrn.projeto.dtos.ItemPedidoDTO;
+import com.bd.ufrn.projeto.dtos.ItemPedido;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,13 +16,13 @@ public class Pedido {
     private LocalDateTime dataPedido;
     private LocalDateTime dataEntrega;
     private Quarto quarto;
-    private List<ItemPedidoDTO> itemPedidoDTOS;
+    private List<ItemPedido> itemPedidos;
 
     public double getCustoTotal() {
-        if (itemPedidoDTOS == null) {
+        if (itemPedidos == null) {
             return 0.0;
         }
-        return itemPedidoDTOS.stream()
+        return itemPedidos.stream()
                 .mapToDouble(item -> item.getPreco() * item.getQuantidade())
                 .sum();
     }
