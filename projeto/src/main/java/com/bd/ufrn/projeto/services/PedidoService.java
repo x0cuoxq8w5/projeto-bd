@@ -54,7 +54,9 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
         if (pedidoDTO.numeroQuarto() != null) pedido.setQuarto(quartoService.get(pedidoDTO.numeroQuarto()));
 
         if (pedidoDTO.itens() != null && !pedidoDTO.itens().isEmpty()) {
-            List<ItemPedido> itens = pedidoDTO.itens().stream().map(itemDTO -> {
+            List<ItemPedido> itens = pedidoDTO.itens().stream()
+                    .filter(java.util.Objects::nonNull)
+                    .map(itemDTO -> {
                 Produto produto = produtoService.get(itemDTO.getProdutoId());
                 return ItemPedido.builder()
                         .produto(produto)

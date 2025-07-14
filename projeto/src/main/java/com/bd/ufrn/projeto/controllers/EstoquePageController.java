@@ -1,6 +1,7 @@
 package com.bd.ufrn.projeto.controllers;
 
 import com.bd.ufrn.projeto.dtos.BreadcrumbItem;
+import com.bd.ufrn.projeto.dtos.PedidoDTO;
 import com.bd.ufrn.projeto.dtos.ProdutoDTO;
 import com.bd.ufrn.projeto.models.Produto;
 import com.bd.ufrn.projeto.services.ProdutoService;
@@ -106,5 +107,30 @@ public class EstoquePageController {
         model.addAttribute("pedido", pedidoService.getByIdAsDto(id));
 
         return "estoque/ver-pedido";
+    }
+
+    @GetMapping("/pedidos/editar/{id}")
+    public String editarPedidoForm(@PathVariable Integer id, Model model) {
+        PedidoDTO pedidoDTO = pedidoService.getByIdAsDto(id);
+        if (pedidoDTO == null) {
+            return "redirect:/estoque/pedidos";
+        }
+
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Pedidos", "/estoque/pedidos", false));
+        breadcrumbs.add(new BreadcrumbItem("Editar", null, true));
+
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Editar Pedido");
+        model.addAttribute("pedido", pedidoDTO);
+        model.addAttribute("produtos", produtoService.getAllAsDto());
+
+        return "estoque/editar-pedido";
+    }
+
+    @PostMapping("/pedidos/editar/{id}")
+    public String salvarPedidoEditado(@PathVariable Integer id, @ModelAttribute("pedido") PedidoDTO pedidoDTO) {
+        pedidoService.update(id, pedidoDTO);
+        return "redirect:/estoque/pedidos";
     }
 }
