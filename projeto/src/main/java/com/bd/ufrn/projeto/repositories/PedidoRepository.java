@@ -46,9 +46,44 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
 
             preparedStatement.setInt(1, numeroQuarto);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                Map<Integer, Pedido> pedidoMap = new LinkedHashMap<>();
                 while (resultSet.next()) {
-                    pedidos.add(mapResultSetToPedido(resultSet));
+                    int pedidoId = resultSet.getInt("id_pedido");
+                    Pedido pedido = pedidoMap.computeIfAbsent(pedidoId, id -> {
+                        try {
+                            Timestamp dataPedidoTs = resultSet.getTimestamp("data_pedido");
+                            Timestamp dataEntregaTs = resultSet.getTimestamp("data_entrega");
+
+                            Quarto quarto = Quarto.builder()
+                                    .numero(resultSet.getInt("numero_quarto"))
+                                    .build();
+
+                            return Pedido.builder()
+                                    .id(pedidoId)
+                                    .dataPedido(dataPedidoTs != null ? dataPedidoTs.toLocalDateTime() : null)
+                                    .dataEntrega(dataEntregaTs != null ? dataEntregaTs.toLocalDateTime() : null)
+                                    .quarto(quarto)
+                                    .itemPedidoDTOS(new ArrayList<>()) 
+                                    .build();
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+                    ItemPedidoDTO item = ItemPedidoDTO.builder()
+                            .produto(Produto.builder()
+                                    .id(resultSet.getInt("id_produto"))
+                                    .nome(resultSet.getString("nome"))
+                                    .precoAtual(resultSet.getDouble("preco_atual"))
+                                    .quantidade(resultSet.getInt("quantidade"))
+                                    .build())
+                            .preco(resultSet.getDouble("preco_item"))
+                            .quantidade(resultSet.getInt("quantidade_item"))
+                            .build();
+
+                    pedido.getItemPedidoDTOS().add(item);
                 }
+                pedidos.addAll(pedidoMap.values());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -75,7 +110,10 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
 
             preparedStatement.setInt(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                return mapResultSetToPedido(resultSet);
+                if (resultSet.next()) {
+                    return mapResultSetToPedido(resultSet);
+                }
+                return null; // Or throw an exception if a Pedido should always be found
             }
         } catch (SQLException e) {
             e.printStackTrace();

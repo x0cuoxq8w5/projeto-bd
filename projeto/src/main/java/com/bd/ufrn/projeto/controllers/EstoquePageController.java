@@ -94,4 +94,17 @@ public class EstoquePageController {
 
         return "estoque/lista-pedidos";
     }
+
+    @GetMapping("/pedidos/ver/{id}")
+    public String verPedido(@PathVariable Integer id, Model model) {
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Pedidos", "/estoque/pedidos", false));
+        breadcrumbs.add(new BreadcrumbItem("Ver", null, true));
+
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Ver Pedido");
+        model.addAttribute("pedido", pedidoService.get(id));
+
+        return "estoque/ver-pedido";
+    }
 }
