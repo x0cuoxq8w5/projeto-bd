@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class ProdutoRepository extends AbstractRepository<Produto> implements St
     @Override
     public Produto findById(Integer id) {
         Produto produto = null;
-        String sql = "SELECT id_produto, preco_atual, quantidade FROM produto WHERE id_produto = ?";
+        String sql = "SELECT id_produto, nome, preco_atual, quantidade FROM produto WHERE id_produto = ?";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
@@ -65,20 +66,41 @@ public class ProdutoRepository extends AbstractRepository<Produto> implements St
                 .id(resultSet.getInt("id_produto"))
                 .precoAtual(resultSet.getDouble("preco_atual"))
                 .quantidade(resultSet.getInt("quantidade"))
+                .nome(resultSet.getString("nome"))
                 .build();
     }
 
     @Override
     public void save(Produto produto) {
-        String sql = "INSERT INTO produto (id_produto, preco_atual, quantidade) VALUES (?, ?, ?)";
+        String sql;
+        boolean exists = findById(produto.getId()) != null;
+
+        if (exists) {
+            sql = "UPDATE produto SET nome = ?, preco_atual = ?, quantidade = ? WHERE id_produto = ?";
+        } else {
+            sql = "INSERT INTO produto (nome, preco_atual, quantidade) VALUES (?, ?, ?)";
+        }
 
         try (Connection connection = connectionFactory.connection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            preparedStatement.setInt(1, produto.getId());
+            preparedStatement.setString(1, produto.getNome());
             preparedStatement.setDouble(2, produto.getPrecoAtual());
             preparedStatement.setInt(3, produto.getQuantidade());
+
+            if (exists) {
+                preparedStatement.setInt(4, produto.getId());
+            }
+
             preparedStatement.executeUpdate();
+
+            if (!exists) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        produto.setId(generatedKeys.getInt(1));
+                    }
+                }
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -104,7 +126,7 @@ public class ProdutoRepository extends AbstractRepository<Produto> implements St
     @Override
     public List<Produto> findAll() {
         List<Produto> produtos = new ArrayList<>();
-        String sql = "SELECT id_produto, preco_atual, quantidade FROM produto";
+        String sql = "SELECT id_produto, preco_atual, quantidade, nome FROM produto";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql);
              ResultSet resultSet = preparedStatement.executeQuery()) {

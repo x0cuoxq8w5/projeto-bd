@@ -1,5 +1,7 @@
 package com.bd.ufrn.projeto.services;
 
+import com.bd.ufrn.projeto.dtos.ProdutoDto;
+
 import com.bd.ufrn.projeto.dtos.ProdutoDTO;
 import com.bd.ufrn.projeto.interfaces.CrudService;
 import com.bd.ufrn.projeto.models.Produto;
@@ -53,5 +55,9 @@ public class ProdutoService implements CrudService<Produto, ProdutoDTO,Integer> 
 
     public List<Produto> getByIds(List<Integer> ids) {
         return produtoRepository.findByIds(ids);
+    }
+
+    public List<ProdutoDto> getAllAsDto() {
+        return produtoRepository.findAll().stream().map(ProdutoDto::new).collect(java.util.stream.Collectors.toList());
     }
 }
