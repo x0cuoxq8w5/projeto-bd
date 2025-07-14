@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout-estoque}">
+<head>
+    <title>Novo Pedido</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Novo Pedido</h1>
+
+        <form th:action="@{/estoque/pedidos/novo}" th:object="${pedido}" method="post" class="bg-white rounded-lg shadow-lg p-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="numeroQuarto" class="block text-sm font-semibold text-gray-600">Quarto:</label>
+                    <input type="number" id="numeroQuarto" th:field="*{numeroQuarto}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required/>
+                </div>
+
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Itens do Pedido</h2>
+
+            <!-- Section to add new items -->
+            <div class="flex items-end gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                <div class="flex-grow">
+                    <label for="produtoSelect" class="block text-sm font-semibold text-gray-600">Adicionar Produto:</label>
+                    <select id="produtoSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option th:each="produto : ${produtos}" th:value="${produto.id}" th:text="${produto.nome}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="quantidadeInput" class="block text-sm font-semibold text-gray-600">Quantidade:</label>
+                    <input type="number" id="quantidadeInput" value="1" min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                </div>
+                <button type="button" id="addItemBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">Adicionar Item</button>
+            </div>
+
+            <!-- Table of items -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Produto</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Quantidade</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-8 text-right">
+                <a th:href="@{/estoque/pedidos}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">Cancelar</a>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">Salvar Pedido</button>
+            </div>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        const produtos = /*[[${produtos}]]*/ [];
+        let itemIndex = 0;
+
+        document.getElementById('addItemBtn').addEventListener('click', () => {
+            const produtoSelect = document.getElementById('produtoSelect');
+            const produtoId = produtoSelect.value;
+            const produtoNome = produtoSelect.options[produtoSelect.selectedIndex].text;
+            const quantidade = document.getElementById('quantidadeInput').value;
+
+            if (!produtoId || !quantidade || quantidade < 1) {
+                alert('Por favor, selecione um produto e insira uma quantidade válida.');
+                return;
+            }
+
+            const tableBody = document.getElementById('itemsTableBody');
+            const newRow = tableBody.insertRow();
+            newRow.innerHTML = `
+                <td>
+                    <input type="hidden" name="itens[${itemIndex}].produtoId" value="${produtoId}"/>
+                    <span>${produtoNome}</span>
+                </td>
+                <td>
+                    <input type="number" name="itens[${itemIndex}].quantidade" value="${quantidade}" min="1" class="w-20 rounded-md border-gray-300 shadow-sm"/>
+                </td>
+                <td>
+                    <button type="button" class="text-red-500 hover:text-red-700 font-bold" onclick="removeItem(this)">Remover</button>
+                </td>
+            `;
+            itemIndex++;
+        });
+
+        function removeItem(button) {
+            const row = button.closest('tr');
+            row.remove();
+        }
+    </script>
+</div>
+</body>
+</html>

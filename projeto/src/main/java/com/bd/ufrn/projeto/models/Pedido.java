@@ -1,8 +1,10 @@
 package com.bd.ufrn.projeto.models;
 
-import com.bd.ufrn.projeto.dtos.ItemPedidoDTO;
+import com.bd.ufrn.projeto.dtos.ItemPedido;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -11,10 +13,21 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pedido {
     private Integer id;
     private LocalDateTime dataPedido;
     private LocalDateTime dataEntrega;
-    private Hospede hospede;
-    private List<ItemPedidoDTO> itemPedidoDTOS;
+    private Quarto quarto;
+    private List<ItemPedido> itemPedidos;
+
+    public double getCustoTotal() {
+        if (itemPedidos == null) {
+            return 0.0;
+        }
+        return itemPedidos.stream()
+                .mapToDouble(item -> item.getPreco() * item.getQuantidade())
+                .sum();
+    }
 }
