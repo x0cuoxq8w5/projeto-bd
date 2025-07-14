@@ -153,4 +153,10 @@ public class EstoquePageController {
         pedidoService.create(pedidoDTO);
         return "redirect:/estoque/pedidos";
     }
+
+    @PostMapping("/pedidos/excluir/{id}")
+    public String excluirPedido(@PathVariable Integer id) {
+        pedidoService.delete(id);
+        return "redirect:/estoque/pedidos";
+    }
 }

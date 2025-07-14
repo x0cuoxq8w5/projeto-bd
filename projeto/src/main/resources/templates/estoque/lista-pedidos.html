@@ -83,16 +83,10 @@
                     class="btn btn-sm btn-link"
                     >Ver</a
                   >
-                  <a
-                    th:href="@{/estoque/pedidos/editar/{id}(id=${pedido.id})}"
-                    class="btn btn-sm btn-link"
-                    >Editar</a
-                  >
-                  <a
-                    th:href="@{/estoque/pedidos/excluir/{id}(id=${pedido.id})}"
-                    class="btn btn-sm btn-link"
-                    >Excluir</a
-                  >
+                  <a th:href="@{/estoque/pedidos/editar/{id}(id=${pedido.id})}" class="text-indigo-600 hover:text-indigo-900 mr-4">Editar</a>
+                  <form th:id="'delete-form-' + ${pedido.id}" th:action="@{/estoque/pedidos/excluir/{id}(id=${pedido.id})}" method="post" class="inline">
+                    <button type="button" th:attr="onclick='openConfirmModal(' + ${pedido.id} + ')'" class="text-red-600 hover:text-red-900">Excluir</button>
+                  </form>
                 </td>
               </tr>
             </tbody>
@@ -111,6 +105,36 @@
           </table>
         </div>
       </div>
+
+      <!-- DaisyUI Modal for confirmation -->
+      <dialog id="confirm_modal" class="modal">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg">Confirmar Exclusão</h3>
+          <p class="py-4">Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.</p>
+          <div class="modal-action">
+            <form method="dialog">
+              <button class="btn">Cancelar</button>
+              <button id="confirm_delete_btn" class="btn btn-error">Excluir</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+
+      <script>
+        let formToSubmit;
+
+        function openConfirmModal(pedidoId) {
+          formToSubmit = document.getElementById('delete-form-' + pedidoId);
+          const modal = document.getElementById('confirm_modal');
+          modal.showModal();
+        }
+
+        document.getElementById('confirm_delete_btn').addEventListener('click', () => {
+          if (formToSubmit) {
+            formToSubmit.submit();
+          }
+        });
+      </script>
     </div>
   </body>
 </html>
