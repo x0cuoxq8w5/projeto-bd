@@ -33,7 +33,11 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
 
         List<ItemPedido> itens = pedidoDTO.itens().stream().map(itemDTO -> {
             Produto produto = produtoService.get(itemDTO.getProdutoId());
-            
+
+            if (produto.getQuantidade() < itemDTO.getQuantidade()) {
+                throw new RuntimeException("Não há estoque suficiente para o produto: " + produto.getNome());
+            }
+
             return ItemPedido.builder()
                     .produto(produto)
                     .quantidade(itemDTO.getQuantidade())
@@ -44,6 +48,12 @@ public class PedidoService implements CrudService<Pedido, PedidoDTO,Integer> {
         pedido.setItemPedidos(itens);
 
         pedidoRepository.save(pedido);
+
+        itens.forEach(item -> {
+            Produto produto = item.getProduto();
+            int novaQuantidade = produto.getQuantidade() - item.getQuantidade();
+            produtoService.update(produto.getId(), new com.bd.ufrn.projeto.dtos.ProdutoDTO(produto.getId(), produto.getNome(), produto.getPrecoAtual(), novaQuantidade));
+        });
     }
 
     @Override
