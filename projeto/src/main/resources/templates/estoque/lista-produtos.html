@@ -45,7 +45,7 @@
                         <p class="text-gray-900 whitespace-no-wrap" th:text="${produto.nome}"></p>
                     </td>
                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        <p class="text-gray-900 whitespace-no-wrap" th:text="${produto.precoAtual}"></p>
+                        <p class="text-gray-900 whitespace-no-wrap" th:text="${#numbers.formatDecimal(produto.precoAtual, 1, 2)}"></p>
                     </td>
                     <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                         <p class="text-gray-900 whitespace-no-wrap" th:text="${produto.quantidade}"></p>
