@@ -67,6 +67,7 @@ public class UserRepository extends AbstractRepository<User> implements StrongEn
             preparedStatement.setInt(1, user.getId());
             preparedStatement.setString(2, user.getName());
             preparedStatement.setString(3, user.getEmail());
+            preparedStatement.setString(4, user.getPassword());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
