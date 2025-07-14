@@ -31,6 +31,10 @@
               <p class="text-sm font-semibold text-gray-600">Data da Entrega:</p>
               <p class="text-lg text-gray-800" th:text="${pedido.dataEntrega != null ? #temporals.format(pedido.dataEntrega, 'dd/MM/yyyy HH:mm') : '-'}"></p>
             </div>
+            <div>
+              <p class="text-sm font-semibold text-gray-600">Custo Total:</p>
+              <p class="text-lg text-gray-800 font-bold" th:text="'R$ ' + ${#numbers.formatDecimal(pedido.custoTotal, 1, 2)}"></p>
+            </div>
           </div>
 
           <h2 class="text-2xl font-bold text-gray-800 mb-4">Itens do Pedido</h2>
@@ -41,6 +45,7 @@
                   <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Produto</th>
                   <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Quantidade</th>
                   <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Preço Unitário</th>
+                  <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -48,6 +53,7 @@
                   <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${item.produto.nome}"></td>
                   <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${item.quantidade}"></td>
                   <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="'R$ ' + ${#numbers.formatDecimal(item.preco, 1, 2)}"></td>
+                  <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="'R$ ' + ${#numbers.formatDecimal(item.preco * item.quantidade, 1, 2)}"></td>
                 </tr>
               </tbody>
             </table>
