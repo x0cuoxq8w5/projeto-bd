@@ -1,5 +1,6 @@
 package com.bd.ufrn.projeto.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +19,7 @@ public class User implements UserDetails {
     private int id;
     private String name;
     private String email;
+    @JsonIgnore
     private String password;
 
     @Override
