@@ -65,12 +65,13 @@ public class ProdutoRepository extends AbstractRepository<Produto> implements St
                 .id(resultSet.getInt("id_produto"))
                 .precoAtual(resultSet.getDouble("preco_atual"))
                 .quantidade(resultSet.getInt("quantidade"))
+                .nome(resultSet.getString("nome"))
                 .build();
     }
 
     @Override
     public void save(Produto produto) {
-        String sql = "INSERT INTO produto (id_produto, preco_atual, quantidade) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO produto (id_produto, preco_atual, quantidade, nome) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -78,6 +79,7 @@ public class ProdutoRepository extends AbstractRepository<Produto> implements St
             preparedStatement.setInt(1, produto.getId());
             preparedStatement.setDouble(2, produto.getPrecoAtual());
             preparedStatement.setInt(3, produto.getQuantidade());
+            preparedStatement.setString(4, produto.getNome());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -104,7 +106,7 @@ public class ProdutoRepository extends AbstractRepository<Produto> implements St
     @Override
     public List<Produto> findAll() {
         List<Produto> produtos = new ArrayList<>();
-        String sql = "SELECT id_produto, preco_atual, quantidade FROM produto";
+        String sql = "SELECT id_produto, preco_atual, quantidade, nome FROM produto";
         try (Connection connection = connectionFactory.connection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql);
              ResultSet resultSet = preparedStatement.executeQuery()) {
