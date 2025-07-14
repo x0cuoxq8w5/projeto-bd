@@ -8,6 +8,6 @@ public record PedidoDTO(
         LocalDateTime dataPedido,
         LocalDateTime dataEntrega,
         Integer numeroQuarto,
-        List<Integer> idProdutos
+        List<ItemPedidoDTO> itens
 ) {
 }

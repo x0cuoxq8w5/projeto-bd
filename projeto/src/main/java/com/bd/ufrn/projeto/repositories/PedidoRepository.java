@@ -168,8 +168,10 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
         INSERT INTO pedido_has_produto (id_pedido, id_produto, preco_item, quantidade_item)
         VALUES (?, ?, ?, ?)
         """;
+        Connection connection = null;
 
-        try (Connection connection = connectionFactory.connection()) {
+        try {
+            connection = connectionFactory.connection();
             connection.setAutoCommit(false);
 
             if (isInsert) {
@@ -220,7 +222,21 @@ public class PedidoRepository extends AbstractRepository<Pedido> implements Stro
 
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
             throw new RuntimeException("Failed to save Pedido", e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

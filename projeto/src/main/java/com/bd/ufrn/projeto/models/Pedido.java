@@ -1,8 +1,10 @@
 package com.bd.ufrn.projeto.models;
 
 import com.bd.ufrn.projeto.dtos.ItemPedido;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -11,6 +13,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pedido {
     private Integer id;
     private LocalDateTime dataPedido;
