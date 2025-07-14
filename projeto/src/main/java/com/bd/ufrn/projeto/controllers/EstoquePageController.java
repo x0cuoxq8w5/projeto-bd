@@ -2,12 +2,14 @@ package com.bd.ufrn.projeto.controllers;
 
 import com.bd.ufrn.projeto.dtos.BreadcrumbItem;
 import com.bd.ufrn.projeto.dtos.ProdutoDTO;
+import com.bd.ufrn.projeto.models.Produto;
 import com.bd.ufrn.projeto.services.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -53,6 +55,28 @@ public class EstoquePageController {
     @PostMapping("/produtos/novo")
     public String salvarNovoProduto(@ModelAttribute("produto") ProdutoDTO produtoDTO) {
         produtoService.create(produtoDTO);
+        return "redirect:/estoque/produtos";
+    }
+
+    @GetMapping("/produtos/editar/{id}")
+    public String editarProdutoForm(@PathVariable Integer id, Model model) {
+        Produto produto = produtoService.get(id);
+        ProdutoDTO produtoDTO = new ProdutoDTO(produto.getId(), produto.getNome(), produto.getPrecoAtual(), produto.getQuantidade());
+
+        List<BreadcrumbItem> breadcrumbs = new ArrayList<>();
+        breadcrumbs.add(new BreadcrumbItem("Produtos", "/estoque/produtos", false));
+        breadcrumbs.add(new BreadcrumbItem("Editar", null, true));
+
+        model.addAttribute("breadcrumbs", breadcrumbs);
+        model.addAttribute("pageTitle", "Editar Produto");
+        model.addAttribute("produto", produtoDTO);
+
+        return "estoque/editar-produto";
+    }
+
+    @PostMapping("/produtos/editar/{id}")
+    public String salvarProdutoEditado(@PathVariable Integer id, @ModelAttribute("produto") ProdutoDTO produtoDTO) {
+        produtoService.update(id, produtoDTO);
         return "redirect:/estoque/produtos";
     }
 }
