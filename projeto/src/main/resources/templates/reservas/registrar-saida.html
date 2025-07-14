@@ -72,39 +72,8 @@
             </div>
           </div>
 
-          <!-- Detalhes da Reserva (inicialmente oculto) -->
-          <div
-            id="reserva-details"
-            class="hidden card bg-base-100/80 backdrop-blur-sm shadow-xl border border-base-300/50"
-          >
-            <div class="card-body">
-              <h2 class="card-title mb-6 text-2xl">
-                <svg
-                  class="w-6 h-6 text-info mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-                Detalhes da Reserva
-              </h2>
-              <input type="hidden" id="reservaId" name="reservaId" />
-              <p><strong>Hóspede:</strong> <span id="hospede-nome"></span></p>
-              <p><strong>Quarto:</strong> <span id="quarto-numero"></span></p>
-              <p><strong>Período:</strong> <span id="periodo"></span></p>
-              <p>
-                <strong>Check-in status:</strong>
-                <span id="checkin-status"></span>
-              </p>
-            </div>
-          </div>
+          <!-- Lista de Reservas (inicialmente oculto) -->
+          <div id="reservas-list" class="hidden"></div>
 
           <!-- Ações -->
           <div class="flex gap-4 justify-end">
@@ -129,7 +98,7 @@
           const cpfInput = document.getElementById('cpf');
           const cpfSpinner = document.getElementById('cpf-spinner');
           const cpfMessage = document.getElementById('cpf-message');
-          const reservaDetails = document.getElementById('reserva-details');
+          const reservasListContainer = document.getElementById('reservas-list');
           const confirmarBtn = document.getElementById('confirmar-saida-btn');
 
           // Máscara de CPF
@@ -151,55 +120,86 @@
             }
 
             cpfSpinner.classList.remove('hidden');
-            reservaDetails.classList.add('hidden');
+            cpfMessage.textContent = '';
+            reservasListContainer.innerHTML = '';
+            reservasListContainer.classList.add('hidden');
             confirmarBtn.classList.add('hidden');
 
             try {
-              const response = await fetch(
-                `/api/reservas/buscar-por-cpf/${cpf}`
-              );
+              const response = await fetch(`/api/reservas/buscar-por-cpf/${cpf}`);
               if (response.ok) {
-                const reserva = await response.json();
-                document.getElementById('reservaId').value = reserva.id;
-                document.getElementById('hospede-nome').textContent =
-                  reserva.hospedeNome;
-                document.getElementById('quarto-numero').textContent =
-                  reserva.quartoNumero;
-                const dataInicio = new Date(
-                  reserva.dataInicio
-                ).toLocaleDateString('pt-BR');
-                const dataFim = new Date(reserva.dataFim).toLocaleDateString(
-                  'pt-BR'
-                );
-                document.getElementById(
-                  'periodo'
-                ).textContent = `${dataInicio} a ${dataFim}`;
+                const reservas = await response.json();
+                const reservasComCheckin = reservas.filter(r => r.dataEntrada && !r.dataSaida);
 
-                if (reserva.dataEntrada) {
-                  document.getElementById('checkin-status').textContent =
-                    new Date(reserva.dataEntrada).toLocaleString('pt-BR');
-                  cpfMessage.textContent =
-                    'Reserva encontrada e check-in realizado.';
-                  cpfMessage.className = 'label-text-alt text-success';
-                  confirmarBtn.classList.remove('hidden');
+                if (reservasComCheckin.length > 0) {
+                    cpfMessage.textContent = `${reservasComCheckin.length} reserva(s) com check-in aguardando saída.`;
+                    cpfMessage.className = 'label-text-alt text-success';
+
+                    const listTitle = document.createElement('h2');
+                    listTitle.className = 'card-title mb-6 text-2xl';
+                    listTitle.innerHTML = `
+                      <svg class="w-6 h-6 text-info mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                      Selecione a Reserva para Registrar a Saída
+                    `;
+
+                    const card = document.createElement('div');
+                    card.className = 'card bg-base-100/80 backdrop-blur-sm shadow-xl border border-base-300/50';
+                    const cardBody = document.createElement('div');
+                    cardBody.className = 'card-body';
+                    cardBody.appendChild(listTitle);
+
+                    const form = document.createElement('div');
+                    form.className = 'space-y-4';
+
+                    reservasComCheckin.forEach(reserva => {
+                      const dataInicio = new Date(reserva.dataInicio).toLocaleDateString('pt-BR');
+                      const dataFim = new Date(reserva.dataFim).toLocaleDateString('pt-BR');
+                      const dataEntrada = new Date(reserva.dataEntrada).toLocaleString('pt-BR');
+
+                      const radioDiv = document.createElement('div');
+                      radioDiv.className = 'form-control';
+
+                      const label = document.createElement('label');
+                      label.className = 'label cursor-pointer p-4 rounded-lg border border-base-300 hover:bg-base-200 transition-colors duration-200';
+
+                      const radioInput = document.createElement('input');
+                      radioInput.type = 'radio';
+                      radioInput.name = 'reservaId';
+                      radioInput.className = 'radio radio-primary';
+                      radioInput.value = reserva.id;
+                      radioInput.addEventListener('change', () => {
+                        confirmarBtn.classList.remove('hidden');
+                      });
+
+                      const span = document.createElement('span');
+                      span.className = 'label-text';
+                      span.innerHTML = `<strong>Hóspede:</strong> ${reserva.hospedeNome}<br>
+                                        <strong>Quarto:</strong> ${reserva.quartoNumero}<br>
+                                        <strong>Período:</strong> ${dataInicio} a ${dataFim}<br>
+                                        <strong>Check-in realizado em:</strong> ${dataEntrada}`;
+
+                      label.appendChild(span);
+                      label.appendChild(radioInput);
+                      radioDiv.appendChild(label);
+                      form.appendChild(radioDiv);
+                    });
+
+                    cardBody.appendChild(form);
+                    card.appendChild(cardBody);
+                    reservasListContainer.appendChild(card);
+                    reservasListContainer.classList.remove('hidden');
                 } else {
-                  document.getElementById('checkin-status').textContent =
-                    'Pendente';
-                  cpfMessage.textContent =
-                    'Check-in ainda não foi realizado para esta reserva.';
-                  cpfMessage.className = 'label-text-alt text-warning';
+                    cpfMessage.textContent = 'Nenhuma reserva com check-in pendente de saída encontrada para este CPF.';
+                    cpfMessage.className = 'label-text-alt text-warning';
                 }
 
-                reservaDetails.classList.remove('hidden');
               } else {
-                cpfMessage.textContent =
-                  'Nenhuma reserva ativa encontrada para este CPF.';
+                cpfMessage.textContent = 'Nenhuma reserva ativa encontrada para este CPF.';
                 cpfMessage.className = 'label-text-alt text-error';
               }
             } catch (error) {
               console.error('Erro ao buscar reserva:', error);
-              cpfMessage.textContent =
-                'Erro ao buscar reserva. Tente novamente.';
+              cpfMessage.textContent = 'Erro ao buscar reserva. Tente novamente.';
               cpfMessage.className = 'label-text-alt text-error';
             } finally {
               cpfSpinner.classList.add('hidden');
